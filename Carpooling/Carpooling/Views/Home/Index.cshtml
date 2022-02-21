@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@model Carpooling.Web.Models.HomeViewModel
+
+@section styles {
+    <link rel="stylesheet" href="~/css/HomePage.css" />
+}
+
+<div class="container">
+    <div class="bg- p-4 p-md-5 mb-4 text-white rounded bg-dark home-page-picture">
+        <div class="col-md-6 px-0">
+            <h1 class="display-4 fst-italic">Welcome to Carpooling</h1>
+            <p class="lead my-3">Where you can share a ride with other people</p>
+        </div>
+    </div>
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">Registered users</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Total amount: @Model.UsersCount</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-4 rounded-3 shadow-sm">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal">All trips</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>Total amount: @Model.TravelsCount</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <label for="drivers">Top 10 drivers</label>
+        <div id="drivers" class="user-container">
+            @foreach (var driver in Model.Top10Drivers)
+            {
+                <div class="item">
+                    <img src="~/images/@driver.ProfilePicture" width="100" height="100" alt="Alternate Text" />
+
+                    <p>@driver.FirstName @driver.LastName</p>
+                </div>
+            }
+        </div>
+    </div>
+    <div>
+        <label for="passengers">Top 10 passengers</label>
+        <div id="passengers" class="user-container">
+            @foreach (var passenger in Model.Top10Passengers)
+            {
+                <div class="item">
+                    <img src="~/images/@passenger.ProfilePicture" width="100" height="100" alt="Alternate Text" />
+                    <p>@passenger.FirstName @passenger.LastName</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

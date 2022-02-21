@@ -1,0 +1,42 @@
+﻿@{ 
+    ViewData["Title"] = "Create";
+}
+
+@model Carpooling.Web.Models.TravelCreateViewModel
+
+<div class="container">
+    <form asp-action="Create" method="post">
+        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Create your new travel</h5>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="StartCity">Starting city</label>
+                <input class="form-control" asp-for="StartCity" type="text" name="startCity" value="" placeholder="Sofia" />
+                <span asp-validation-for="StartCity"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="DestinationCity">Destination city</label>
+                <input class="form-control" asp-for="DestinationCity" type="text" name="destinationCity" value="" placeholder="Plovdiv" />
+                <span asp-validation-for="DestinationCity"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="DepartureTime">Departure time</label>
+                <input class="form-control" asp-for="DepartureTime" type="datetime-local" name="departureTime" value="" placeholder="19.12.2025 17:50:00" />
+                <span asp-validation-for="DepartureTime"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="Spots">Free spots</label>
+                <input class="form-control" asp-for="Spots" type="number" name="spots" value="" placeholder="2" />
+                <span asp-validation-for="Spots"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <select multiple="multiple" class="form-control" asp-for="SlectedTags" asp-items="Model.Tags"></select>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+</div>

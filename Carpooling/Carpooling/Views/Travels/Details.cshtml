@@ -1,0 +1,163 @@
+﻿@{
+    ViewData["Title"] = "Details";
+    ViewData["CurrentUser"] = this.Context.Session.GetString("CurrentUser");
+    var Params = new Dictionary<string, string>
+{
+        { "travelId", $"{Model.Id}" }
+    };
+}
+
+@model Carpooling.Web.Models.TravelDetailsViewModel
+
+@section styles
+{
+    <link href="~/css/TravelDetails.css" rel="stylesheet" />
+}
+
+<div class="blog-single gray-bg">
+    <div class="container">
+        <div class="row align-items-start">
+            <div class="col-lg-8 m-15px-tb">
+                <article class="article">
+                    <div class="article-title">
+                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Travel from @Model.StartCity to @Model.DestinationCity</h5>
+                    </div>
+                    <div class="article-content">
+                        <p>The time of departure for this travel is on @Model.DepartureTime</p>
+                        <p>There are a total of @Model.AvailableSpots spots left for passengers to join.</p>
+                    </div>
+                    <label for="optional-comments">Preferences</label>
+                    <div id="optional-comments" class="nav tag-cloud">
+                        @foreach (var tag in Model.Tags)
+                        {   
+                            <a href="#">@tag</a>
+                        }
+                    </div>
+                </article>
+                @if (Model.Applicants.Any(applicant => applicant.Username == ViewData["CurrentUser"].ToString()))
+                {
+                    <div class="contact-form article-comment">
+                        <a asp-action="Leave" asp-route-Id="@Model.Id">Cancel appliance</a>
+                    </div>
+                }
+                else if (Model.Participants.Any(participant => participant.Username == ViewData["CurrentUser"].ToString()))
+                {
+                    <div class="contact-form article-comment">
+                        <a asp-action="Leave" asp-route-Id="@Model.Id">Cancel participation</a>
+                    </div>
+                }
+                else if (Model.Driver.Username == ViewData["CurrentUser"].ToString() && Model.Completed == false)
+                {
+                    <div class="contact-form article-comment">
+                        <a asp-action="Complete" asp-route-Id="@Model.Id">Mark travel as completed</a>
+                    </div>
+                }
+                else if (Model.Applicants.All(applicant => applicant.Username != ViewData["CurrentUser"].ToString()) &&
+                         Model.Participants.All(participant => participant.Username != ViewData["CurrentUser"].ToString()) &&
+                         Model.Driver.Username != ViewData["CurrentUser"].ToString())
+                {
+                    <div class="contact-form article-comment">
+                        <a asp-action="Apply" asp-route-Id="@Model.Id">Apply to travel</a>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-4 m-15px-tb blog-aside">
+                <div class="widget widget-author">
+                    <div class="widget-title">
+                        <h3>Driver</h3>
+                    </div>
+                    <div class="widget-body">
+                        <div class="media align-items-center">
+                            <div class="avatar">
+                                <img src="~/images/@Model.Driver.ProfilePicture" title="" alt="">
+                            </div>
+                            <div class="media-body">
+                                <h6>@Model.Driver.FirstName @Model.Driver.LastName</h6>
+                            </div>
+                        </div>
+                        <p>Rating as a driver: @Model.Driver.RatingAsDriver</p>
+                        <p>Also known as @Model.Driver.Username</p>
+                    </div>
+                </div>
+                @if (Model.Driver.Username == ViewData["CurrentUser"].ToString())
+                {
+                    <div class="widget widget-latest-post">
+                        <div class="widget-title">
+                            <h3>Approved passengers</h3>
+                        </div>
+                        <div class="widget-body">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Rating as passenger</td>
+                                        <td>Action</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var participant in Model.Participants)
+                                    {
+                                        <tr>
+                                            <td>@participant.FirstName @participant.LastName</td>
+                                            <td>@participant.RatingAsPassenger</td>
+                                            @if (Model.Completed == false)
+                                            {
+                                                <td>
+                                                    <a class="btn btn-info" asp-action="Reject" asp-all-route-data="@Params" asp-route-id="@participant.Id">Reject</a>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>The travel is completed</td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+
+                @if (Model.Driver.Username == ViewData["CurrentUser"].ToString())
+                {
+                <div class="widget widget-tags">
+                    <div class="widget-title">
+                        <h3>Applied passengers</h3>
+                    </div>
+                    <div class="widget-body">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Rating as passenger</td>
+                                    <td>Actions</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var applicant in Model.Applicants)
+                                {
+                                <tr>
+                                    <td>@applicant.FirstName @applicant.LastName</td>
+                                    <td>@applicant.RatingAsPassenger</td>
+                                    @if (Model.Completed == false)
+                                    {
+                                        <td>
+                                            <a class="btn btn-info" asp-action="Accept" asp-all-route-data="@Params" asp-route-id="@applicant.Id">Accept</a>
+                                            <a class="btn btn-info" asp-action="Reject" asp-all-route-data="@Params" asp-route-id="@applicant.Id">Reject</a>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>The travel is completed</td>
+                                    }
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

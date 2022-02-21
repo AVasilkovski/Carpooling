@@ -1,0 +1,75 @@
+﻿@{ 
+    ViewData["CurrentUser"] = this.Context.Session.GetString("CurrentUser");
+    var Params = new Dictionary<string, string>
+    {
+        { "travelId", $"{ViewData["TravelId"]}" }
+    };
+}
+
+@model Carpooling.Web.Models.ParticipantsViewModel
+
+<div>
+    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Participants in the travel</h5>
+    <table class="table table-hover">
+        @if (Model.Passengers.Any(passenger => passenger.Username == ViewData["CurrentUser"].ToString()))
+        {
+            <thead>
+                <tr>
+                    <td>Driver</td>
+                    <td>Rating</td>
+                    <td>Leave comment</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.Driver.FirstName @Model.Driver.LastName</td>
+                    <td>@Model.Driver.RatingAsDriver</td>
+                    @if (Model.Feedbacks.All(feedback => feedback.Username != ViewData["CurrentUser"].ToString()))
+                    {
+                        <td>
+                            <a class="btn btn-info" asp-controller="Feedbacks" asp-action="Create" asp-all-route-data="@Params" asp-route-id="@Model.Driver.Id">Comment</a>
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <p>Already left a comment</p>
+                        </td>
+                    }
+                </tr>
+            </tbody>
+        }
+        else
+        {
+            <thead>
+                <tr>
+                    <td>Passenger</td>
+                    <td>Rating</td>
+                    <td>Leave comment</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var passenger in Model.Passengers)
+                {
+                    <tr>
+                        <td>@passenger.FirstName @passenger.LastName</td>
+                        <td>@passenger.RatingAsPassenger</td>
+                        @if (Model.Feedbacks.All(feedback => feedback.Username != ViewData["CurrentUser"].ToString()))
+                        {
+                            <td>
+                                <a class="btn btn-info" asp-controller="Feedbacks" asp-action="Create" asp-all-route-data="@Params" asp-route-id="@passenger.Id">Comment</a>
+                            </td>
+                        }
+                        else
+                        {
+                            <td>
+                                <p>Already left a comment</p>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+    <a class="btn btn-primary" asp-action="Finished">Back</a>
+</div>

@@ -1,0 +1,70 @@
+﻿@{ 
+    ViewData["Title"] = "Register";
+}
+@model Carpooling.Web.Models.RegisterViewModel
+
+<div class="row d-flex justify-content-center">
+    <div class="col-12">
+        <div class="card" style="border-radius: 1rem;">
+            <div class="row g-0">
+                <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                    <div class="card-body p-4 p-lg-5 text-black">
+                        <form asp-action="Register">
+                            <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Create your account</h5>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="Username" style="margin-left: 0px;">Username</label>
+                                <input asp-for="Username" class="form-control form-control-lg">
+                                <span asp-validation-for="Username"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 88.8px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="Password" style="margin-left: 0px;">Password</label>
+                                <input type="password" asp-for="Password" class="form-control form-control-lg">
+                                <span asp-validation-for="Password"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 64px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="FirstName" style="margin-left: 0px;">First name</label>
+                                <input type="text" asp-for="FirstName" class="form-control form-control-lg">
+                                <span asp-validation-for="FirstName"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 64px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="LastName" style="margin-left: 0px;">Last name</label>
+                                <input type="text" asp-for="LastName" class="form-control form-control-lg">
+                                <span asp-validation-for="LastName"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 64px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="Email" style="margin-left: 0px;">Email</label>
+                                <input type="email" asp-for="Email" class="form-control form-control-lg">
+                                <span asp-validation-for="Email"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 64px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="PhoneNumber" style="margin-left: 0px;">Phone number</label>
+                                <input type="number" asp-for="PhoneNumber" class="form-control form-control-lg">
+                                <span asp-validation-for="PhoneNumber"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 64px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <span>@Html.ValidationMessage("RegisterError")</span>
+
+                            <div class="pt-1 mb-4">
+                                <input class="btn btn-dark btn-lg btn-block" type="submit" name="Register" value="Register" />
+                            </div>
+
+                            <p class="mb-5 pb-lg-2" style="color: #393f81;">Already have an account? <a asp-action="Login" style=" color: #393f81;">Login</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

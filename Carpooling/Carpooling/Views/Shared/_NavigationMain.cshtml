@@ -1,0 +1,74 @@
+﻿@{
+    this.ViewData["IsAuthenticated"] = this.Context.Session.Keys.Contains("CurrentUser");
+    this.ViewData["CurrentUser"] = this.Context.Session.GetString("CurrentUser");
+    this.ViewData["CurrentRoles"] = this.Context.Session.GetString("CurrentRoles");
+    this.ViewData["ProfilePicture"] = this.Context.Session.GetString("ProfilePicture");
+    this.ViewData["UserId"] = this.Context.Session.GetString("UserId");
+}
+
+<nav class="navbar navbar-dark bg-primary navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3 ">
+    <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <img class="rounded-pill" style="width:40px" src="~/images/Logo.png" alt="Logo" /> Carpooling
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+                <a class="nav-link btn btn-outline-primary" asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn btn-outline-primary" asp-controller="Home" asp-action="AboutUs">About Us</a>
+            </li>
+            @if ((bool)ViewData["IsAuthenticated"])
+            {
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-primary" asp-controller="Travels" asp-action="Index">Travels</a>
+                </li>
+                @if (ViewData["CurrentRoles"].ToString().Contains("Admin"))
+                {
+                    <li class="nav-item">
+                        <div class="dropdown">
+                            <button class="nav-link btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" value="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Admin pannel
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a asp-controller="Admin" asp-action="Users" class="dropdown-item">Users</a>
+                                <a asp-controller="Admin" asp-action="Travels" class="dropdown-item">Travels</a>
+                            </div>
+                        </div>
+                    </li>
+                }
+            }
+        </ul>
+        @if ((bool)ViewData["IsAuthenticated"])
+        {
+            <div class="form-inline navbar-nav my-2 my-lg-0">
+                <div class="dropdown mr-sm-2">
+                    <button class="nav-link btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" value="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @ViewData["CurrentUser"]
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a asp-controller="Users" asp-action="MyProfile" asp-route-id="@ViewData["UserId"]" class="dropdown-item">My profile</a>
+                        <a asp-controller="MyTravels" asp-action="Index" class="dropdown-item">My Travels</a>
+                        <a asp-controller="Authentication" asp-action="Logout" class="dropdown-item">Logout</a>
+                    </div>
+                </div>
+                <a class="nav-link my-2 my-sm-0" asp-controller="Users" asp-action="MyProfile" asp-route-id="@ViewData["UserId"]">
+                    <img class="rounded-circle" src="~/images/@ViewData["ProfilePicture"]" alt="Profile picture" height="40" width="50" />
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="form-inline navbar-nav my-2 my-lg-0">
+                <div class="mr-sm-2">
+                    <a class="nav-link btn btn-outline-primary"  asp-controller="Authentication" asp-action="Login">Login</a>
+                </div>
+                <a class="nav-link btn-outline-primary my-2 my-sm-0" asp-controller="Authentication" asp-action="Register">Register</a>
+            </div>
+        }
+    </div>
+</nav>
