@@ -1,0 +1,16 @@
+﻿.user-container {
+    overflow: auto;
+    white-space: nowrap;
+}
+
+.item {
+    padding: 10px;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 20px;
+    white-space: normal;
+}
+
+.home-page-picture {
+    background-image: url(~/images/car-sharing.jpg);
+}

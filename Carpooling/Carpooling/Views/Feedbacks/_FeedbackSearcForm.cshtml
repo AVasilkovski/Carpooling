@@ -1,0 +1,52 @@
+﻿@model IEnumerable<FeedbackSearchViewModel>
+
+<div class="container">
+    <div class="row">
+        <form asp-action="@ViewData["Action"]" asp-route-id="@ViewData["VisitedFeedbacksUserId"]" method="get">
+            <label for="Filter">Filter by:</label>
+            <div id="Filter" class="form-row">
+                <div class="col">
+                    <input type="text" class="form-control" name="username" placeholder="Username" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="rating" placeholder="Rating" />
+                </div>
+            </div>
+            <label for="Sort">Sort by:</label>
+            <div id="Sort" class="form-row">
+                <div class="col">
+                    <label for="ratingSort">Rating</label>
+                    <input type="checkbox" name="ratingSort" value="true" />
+                </div>
+                <div class="col">
+                    <input type="submit" class="btn btn-info" name="submit" value="Search" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>Username</td>
+                    <td>Comment</td>
+                    <td>Rating</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var feedback in Model)
+                {
+                <tr>
+                    <td>
+                        <a btn btn-info asp-controller="Users" asp-action="MyProfile" asp-route-id="@feedback.UserId">@feedback.FullName</a>
+                    </td>
+                    <td>@feedback.Username</td>
+                    <td>@feedback.Comment</td>
+                    <td>@feedback.Rating</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

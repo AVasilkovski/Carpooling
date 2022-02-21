@@ -1,0 +1,61 @@
+﻿@{ 
+    ViewData["Title"] = "Users";
+}
+@model IEnumerable<UserViewModel>
+
+<div class="container">
+    <div class="row">
+        <form asp-action="Users" method="get">
+            <label for="Filter">Filter by:</label>
+            <div id="Filter" class="form-row">
+                <div class="col">
+                    <input type="text" class="form-control" name="Username" value="@ViewData["Username"]" placeholder="Username" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="Email" value="@ViewData["Email"]" placeholder="Email" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" name="PhoneNumber" value="@ViewData["PhoneNumber"]" placeholder="Phone number" />
+                </div>
+                <div class="col">
+                    <input type="submit" class="btn btn-info" name="submit" value="Search" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <td>Username</td>
+                    <td>Email</td>
+                    <td>Phone number</td>
+                    <td>Status</td>
+                    <td>Action</td>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                <tr>
+                    <td>@user.Username</td>
+                    <td>@user.Email</td>
+                    <td>@user.PhoneNumber</td>
+                    <td>@user.Status</td>
+                    <td>
+                        @if (user.Status == "Blocked")
+                        {
+
+                            <a class="btn btn-info" asp-action="Unblock" asp-route-id="@user.Id">Unblock</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-info" asp-action="Block" asp-route-id="@user.Id">Block</a>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

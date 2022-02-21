@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Update profile";
+}
+@model Carpooling.Web.Models.UserUpdateViewModel
+
+<div class="container">
+    <form asp-action="Update" method="post" enctype="multipart/form-data">
+        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Edit your profile</h5>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="ProfilePicture" class="control-label"></label>
+                <div class="custom-file">
+                    <input asp-for="ProfilePicture" class="custom-file-input form-control" id="customFile" name="ProfilePicture">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="Password"></label>
+                <input class="form-control" type="password" asp-for="Password" name="Password" value="@Model.Password" />
+                <span></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="Email"></label>
+                <input class="form-control" type="email" asp-for="Email" name="Email" value="@Model.Email" />
+                <span asp-validation-for="Email"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="PhoneNumber"></label>
+                <input class="form-control" type="number" asp-for="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" />
+                <span asp-validation-for="PhoneNumber"></span>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="FirstName"></label>
+                <input class="form-control" type="text" asp-for="FirstName" name="FirstName" value="@Model.FirstName" />
+                <span asp-validation-for="FirstName"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="LastName"></label>
+                <input class="form-control" type="text" asp-for="LastName" name="LastName" value="@Model.LastName" />
+                <span asp-validation-for="LastName"></span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+  $(".custom-file-input").on("change", function () {
+   var fileName = $(this).val().split("\\").pop();
+   $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+  });
+    </script>
+}

@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+@model Carpooling.Web.Models.LoginViewModel
+
+<div class="row d-flex justify-content-center">
+    <div class="col-12">
+        <div class="card" style="border-radius: 1rem;">
+            <div class="row g-0">
+                <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                    <div class="card-body p-4 p-lg-5 text-black">
+                        <form asp-action="Login">
+                            <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="Username" style="margin-left: 0px;">Username</label>
+                                <input asp-for="Username" class="form-control form-control-lg">
+                                <span asp-validation-for="Username"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 88.8px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <div class="form-outline mb-4">
+                                <label class="form-label" asp-for="Password" style="margin-left: 0px;">Password</label>
+                                <input type="password" asp-for="Password" class="form-control form-control-lg">
+                                <span asp-validation-for="Password"></span>
+                                <div class="form-notch"><div class="form-notch-leading" style="width: 9px;"></div><div class="form-notch-middle" style="width: 64px;"></div><div class="form-notch-trailing"></div></div>
+                            </div>
+
+                            <div class="pt-1 mb-4">
+                                <input class="btn btn-dark btn-lg btn-block" type="submit" name="Login" value="Login" />
+                            </div>
+
+                            <span>@Html.ValidationMessage("LogInError")</span>
+
+                            <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a asp-action="Register" style="color: #393f81;">Register Here</a></p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

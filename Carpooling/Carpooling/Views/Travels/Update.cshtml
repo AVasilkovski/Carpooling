@@ -1,0 +1,25 @@
+﻿@{ 
+    ViewData["Title"] = "Update";
+}
+
+@model Carpooling.Web.Models.TravelUpdateViewModel
+
+<div class="container">
+    <form asp-action="Update" method="post">
+        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Edit your travel</h5>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label asp-for="DepartureTime">Departure time</label>
+                <input class="form-control" asp-for="DepartureTime" type="datetime-local" name="departureTime" value="@DateTime.Now" />
+                <span asp-validation-for="DepartureTime"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="Spots">Free spots</label>
+                <input class="form-control" asp-for="Spots" type="number" name="spots" value="1" placeholder="2" />
+                <span asp-validation-for="Spots"></span>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </form>
+</div>
