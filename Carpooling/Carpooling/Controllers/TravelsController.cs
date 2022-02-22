@@ -5,6 +5,7 @@ using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers
 {
@@ -41,7 +42,7 @@ namespace Carpooling.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(TravelCreateViewModel travelCreateViewModel)
+        public async Task<IActionResult> Create(TravelCreateViewModel travelCreateViewModel)
         {
             if (!this.ModelState.IsValid)
             {
@@ -57,7 +58,7 @@ namespace Carpooling.Web.Controllers
 
             var driverId = int.Parse(this.HttpContext.Session.GetString("UserId"));
             var travel = travelCreateViewModel.ToTravelCreateDTO(driverId);
-            this.travelService.Create(travel);
+            await this.travelService.CreateAsync(travel);
             return RedirectToAction("Index", "MyTravels");
         }
 
@@ -68,7 +69,7 @@ namespace Carpooling.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(int id, TravelUpdateViewModel travelUpdateViewModel)
+        public async Task<IActionResult> Update(int id, TravelUpdateViewModel travelUpdateViewModel)
         {
             if (!this.ModelState.IsValid)
             {
@@ -76,7 +77,7 @@ namespace Carpooling.Web.Controllers
             }
 
             var travel = travelUpdateViewModel.ToTravelUpdate();
-            this.travelService.Update(id, travel);
+            await this.travelService.UpdateAsync(id, travel);
             return RedirectToAction("Index", "MyTravels");
         }
 
@@ -87,43 +88,43 @@ namespace Carpooling.Web.Controllers
             return View(travelDetails);
         }
 
-        public IActionResult Apply(int id)
+        public async Task<IActionResult> Apply(int id)
         {
             var userId = int.Parse(this.HttpContext.Session.GetString("UserId"));
-            this.travelService.ApplyAsPassenger(userId, id);
+            await this.travelService.ApplyAsPassengerAsync(userId, id);
             return RedirectToAction("Index", "Travels");
         }
 
-        public IActionResult Complete(int id)
+        public async Task<IActionResult> Complete(int id)
         {
-            this.travelService.MarkAsComplete(id);
+            await this.travelService.MarkAsCompleteAsync(id);
             return RedirectToAction("Index", "MyTravels");
         }
 
-        public IActionResult Cancel(int id)
+        public async Task<IActionResult> Cancel(int id)
         {
-            this.travelService.CancelTrip(id);
+            await this.travelService.CancelTripAsync(id);
             return RedirectToAction("Index", "MyTravels");
         }
 
-        public IActionResult Accept(int id, int travelId)
+        public async Task<IActionResult> Accept(int id, int travelId)
         {
             var driverId = int.Parse(this.HttpContext.Session.GetString("UserId"));
-            this.travelService.AddPassenger(id, driverId, travelId);
+            await this.travelService.AddPassengerAsync(id, driverId, travelId);
             return RedirectToAction("Details", "Travels", new { Id = travelId });
         }
 
-        public IActionResult Reject(int id, int travelId)
+        public async Task<IActionResult> Reject(int id, int travelId)
         {
             var driverId = int.Parse(this.HttpContext.Session.GetString("UserId"));
-            this.travelService.RejectPassenger(id, driverId, travelId);
+            await this.travelService.RejectPassengerAsync(id, driverId, travelId);
             return RedirectToAction("Details", "Travels", new { Id = travelId });
         }
 
-        public IActionResult Leave(int id)
+        public async Task<IActionResult> Leave(int id)
         {
             var userId = int.Parse(this.HttpContext.Session.GetString("UserId"));
-            this.travelService.CancelParticipation(userId, id);
+            await this.travelService.CancelParticipationAsync(userId, id);
             return RedirectToAction("Index", "Travels");
         }
     }

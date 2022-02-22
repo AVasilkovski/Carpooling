@@ -45,12 +45,12 @@ namespace Carpooling.Tests.Tests.UserTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new UserService(assertContext);
-                var actual = sut.Update(id, user);
-                Assert.AreEqual(expected.Email, actual.Email);
-                Assert.AreEqual(expected.FirstName, actual.FirstName);
-                Assert.AreEqual(expected.LastName, actual.LastName);
-                Assert.AreEqual(expected.PhoneNumber, actual.PhoneNumber);
-                Assert.AreEqual(expected.ProfilePicture, actual.ProfilePic);
+                var actual = sut.UpdateAsync(id, user);
+                Assert.AreEqual(expected.Email, actual.Result.Email);
+                Assert.AreEqual(expected.FirstName, actual.Result.FirstName);
+                Assert.AreEqual(expected.LastName, actual.Result.LastName);
+                Assert.AreEqual(expected.PhoneNumber, actual.Result.PhoneNumber);
+                Assert.AreEqual(expected.ProfilePicture, actual.Result.ProfilePic);
             }
         }
     }

@@ -4,6 +4,7 @@ using Carpooling.Web.Helpers.Contracts;
 using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers
 {
@@ -64,7 +65,7 @@ namespace Carpooling.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterViewModel registerViewModel)
+        public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (!this.ModelState.IsValid)
             {
@@ -82,7 +83,7 @@ namespace Carpooling.Web.Controllers
             }
 
             var user = registerViewModel.ToUserCreateDTO();
-            this.userService.Create(user);
+            await this.userService.CreateAsync(user);
             return this.RedirectToAction(nameof(this.Login));
         }
     }

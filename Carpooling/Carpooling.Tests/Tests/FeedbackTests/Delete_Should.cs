@@ -6,6 +6,7 @@ using Carpooling.Services.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.FeedbackTests
 {
@@ -30,7 +31,7 @@ namespace Carpooling.Tests.Tests.FeedbackTests
         }
 
         [TestMethod]
-        public void DeleteFeedback_When_ParamsAreValid()
+        public async Task DeleteFeedback_When_ParamsAreValid()
         {
             var id = 1;
             var userService = new Mock<IUserService>();
@@ -45,7 +46,7 @@ namespace Carpooling.Tests.Tests.FeedbackTests
             using (var assertContext = new CarpoolingContext(options))
             {
                 var sut = new FeedbackService(assertContext, userService.Object);
-                var actual = sut.Delete(id);
+                var actual = await sut.DeleteAsync(id);
                 Assert.AreEqual(expected.Comment, actual.Comment);
                 Assert.AreEqual(expected.Rating, actual.Rating);
                 Assert.AreEqual(expected.TravelId, actual.TravelId);

@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -32,7 +33,7 @@ namespace Carpooling.Tests.Tests.TravelTests
         }
 
         [TestMethod]
-        public void CreateTravel_When_ParamsAreValid()
+        public async Task CreateTravel_When_ParamsAreValid()
         {
             var id = 1;
             var travelTagService = new Mock<ITravelTagService>();
@@ -49,7 +50,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
 
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                var actual = sut.Update(id, travel);
+                var actual = await sut.UpdateAsync(id, travel);
                 Assert.AreEqual(expected.DepartureTime, actual.DepartureTime);
                 Assert.AreEqual(expected.FreeSpots, actual.FreeSpots);
             }

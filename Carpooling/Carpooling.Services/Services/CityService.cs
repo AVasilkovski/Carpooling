@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Carpooling.Data;
 using Carpooling.Data.Models;
 using Carpooling.Services.Services.Contracts;
@@ -14,12 +15,12 @@ namespace Carpooling.Services.Services
             this.dbContex = dbContex;
         }
 
-        public City CheckIfCityExist(string cityName)
+        public async Task<City> CheckIfCityExistAsync(string cityName)
         {
             var result = this.dbContex.Cities.FirstOrDefault(city => city.Name == cityName);
             if (result == null)
             {
-                return this.CreateCity(cityName);
+                return await this.CreateCityAsync(cityName);
             }
             else
             {
@@ -27,12 +28,12 @@ namespace Carpooling.Services.Services
             }
         }
 
-        public City CreateCity(string city)
+        public async Task<City> CreateCityAsync(string city)
         {
             var newCity = new City { Name = city };
 
-            this.dbContex.Cities.Add(newCity);
-            this.dbContex.SaveChanges();
+            await this.dbContex.Cities.AddAsync(newCity);
+            await this.dbContex.SaveChangesAsync();
 
             return newCity;
         }

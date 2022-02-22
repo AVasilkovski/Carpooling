@@ -5,6 +5,7 @@ using Carpooling.Services.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -42,12 +43,12 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<EntityNotFoundException>(() => sut.RejectPassenger(userId, driverId, travelId));
+                Assert.ThrowsException<EntityNotFoundException>(() => sut.RejectPassengerAsync(userId, driverId, travelId));
             }
         }
 
         [TestMethod]
-        public void RemovePassenger_When_ParamsAreValid()
+        public async Task RemovePassenger_When_ParamsAreValid()
         {
             var userId = 10;
             var travelId = 3;
@@ -58,9 +59,9 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
                 var expected = 4;
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                sut.ApplyAsPassenger(userId, travelId);
-                sut.AddPassenger(userId, driverId, travelId);
-                sut.RejectPassenger(userId, driverId, travelId);
+                await sut.ApplyAsPassengerAsync(userId, travelId);
+                await sut.AddPassengerAsync(userId, driverId, travelId);
+                await sut.RejectPassengerAsync(userId, driverId, travelId);
                 var actual = sut.Get(travelId).FreeSpots;
                 Assert.AreEqual(expected, actual);
             }

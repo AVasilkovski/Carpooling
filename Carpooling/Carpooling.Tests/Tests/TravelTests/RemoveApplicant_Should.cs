@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -42,12 +43,12 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<EntityNotFoundException>(() => sut.CancelParticipation(userId, travelId));
+                Assert.ThrowsException<EntityNotFoundException>(() => sut.CancelParticipationAsync(userId, travelId));
             }
         }
 
         [TestMethod]
-        public void RemoveApplicant_When_ParamsAreValid()
+        public async Task RemoveApplicant_When_ParamsAreValid()
         {
             var userId = 10;
             var travelId = 3;
@@ -57,8 +58,8 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
                 var expected = 0;
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                sut.ApplyAsPassenger(userId, travelId);
-                sut.CancelParticipation(userId, travelId);
+                await sut.ApplyAsPassengerAsync(userId, travelId);
+                await sut.CancelParticipationAsync(userId, travelId);
                 var actual = sut.Get(travelId).ApplyingPassengers.Count();
                 Assert.AreEqual(expected, actual);
             }

@@ -6,6 +6,7 @@ using Carpooling.Services.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.FeedbackTests
 {
@@ -31,7 +32,7 @@ namespace Carpooling.Tests.Tests.FeedbackTests
         }
 
         [TestMethod]
-        public void CreateFeedback_When_ParamsAreValid()
+        public async Task CreateFeedback_When_ParamsAreValid()
         {
             var feedback = new FeedbackCreateDTO()
             {
@@ -66,13 +67,13 @@ namespace Carpooling.Tests.Tests.FeedbackTests
             {
                 var sut = new FeedbackService(assertContext, userService.Object);
                 var userservice = new UserService(assertContext);
-                userservice.Create(user1);
-                userservice.Create(user2);
-                var actual = sut.Create(feedback);
-                Assert.AreEqual(expected.Comment, actual.Comment);
-                Assert.AreEqual(expected.Rating, actual.Rating);
-                Assert.AreEqual(expected.TravelId, actual.TravelId);
-                Assert.AreEqual(expected.Type, actual.Type);
+                await userservice.CreateAsync(user1);
+                await userservice .CreateAsync(user2);
+                var actual = sut.CreateAsync(feedback);
+                Assert.AreEqual(expected.Comment, actual.Result.Comment);
+                Assert.AreEqual(expected.Rating, actual.Result.Rating);
+                Assert.AreEqual(expected.TravelId, actual.Result.TravelId);
+                Assert.AreEqual(expected.Type, actual.Result.Type);
             }
         }
     }

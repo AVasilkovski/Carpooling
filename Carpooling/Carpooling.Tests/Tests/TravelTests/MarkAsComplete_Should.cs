@@ -4,6 +4,7 @@ using Carpooling.Services.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -31,7 +32,7 @@ namespace Carpooling.Tests.Tests.TravelTests
         }
 
         [TestMethod]
-        public void MarkTravelCorrectly_When_ParamsAreValid()
+        public async Task MarkTravelCorrectly_When_ParamsAreValid()
         {
             var travelId = 1;
             var travelTagService = new Mock<ITravelTagService>();
@@ -40,7 +41,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
                 var expected = true;
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                sut.MarkAsComplete(travelId);
+                await sut.MarkAsCompleteAsync(travelId);
                 var actual = sut.Get(travelId).IsCompleted;
                 Assert.AreEqual(expected, actual);
             }

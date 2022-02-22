@@ -7,6 +7,7 @@ using Carpooling.Data.Models;
 using Carpooling.Services.DTOs;
 using Carpooling.Services.Services.Contracts;
 using Carpooling.Services.Exceptions;
+using System.Threading.Tasks;
 
 namespace Carpooling.Services.Services
 {
@@ -52,22 +53,22 @@ namespace Carpooling.Services.Services
             return result;
         }
 
-        public TravelPresentDTO Create(TravelCreateDTO newTravel)
+        public async Task<TravelPresentDTO> CreateAsync(TravelCreateDTO newTravel)
         {
-            var startCity = this.cityService.CheckIfCityExist(newTravel.StartPointAddress.City);
-            var destinationCity = this.cityService.CheckIfCityExist(newTravel.EndPointAddress.City);
+            var startCity = this.cityService.CheckIfCityExistAsync(newTravel.StartPointAddress.City);
+            var destinationCity = this.cityService.CheckIfCityExistAsync(newTravel.EndPointAddress.City);
             var travel = newTravel.ToTravel();
-            travel.StartPointCity = startCity;
-            travel.EndPointCity = destinationCity;
+            travel.StartPointCity = await startCity;
+            travel.EndPointCity = await destinationCity;
             travel.TravelTags = this.travelTagService.FindTags(newTravel.TravelTags);
-            this.dbContext.Travels.Add(travel);
-            this.dbContext.SaveChanges();
+            await this.dbContext.Travels.AddAsync(travel);
+            await this.dbContext.SaveChangesAsync();
             travel = this.GetTravel(travel.Id);
 
             return travel.ToTravelDTO();
         }
 
-        public TravelPresentDTO Update(int id, TravelCreateDTO travel)
+        public async Task<TravelPresentDTO> UpdateAsync(int id, TravelCreateDTO travel)
         {
             var travelToUpdate = this.GetTravel(id);
 
@@ -82,16 +83,16 @@ namespace Carpooling.Services.Services
             }
 
             this.dbContext.Update(travelToUpdate);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
 
             return travelToUpdate.ToTravelDTO();
         }
 
-        public void Delete(int id)
+        public async Task DeleteAsync(int id)
         {
             var travel = GetTravel(id);
             this.dbContext.Remove(travel);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
         public IEnumerable<TravelPresentDTO> SearchAllTravels(string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -187,7 +188,7 @@ namespace Carpooling.Services.Services
             return travels;
         }
 
-        public void ApplyAsPassenger(int userId, int travelId)
+        public async Task ApplyAsPassengerAsync(int userId, int travelId)
         {
             var travel = this.GetTravel(travelId);
 
@@ -208,7 +209,7 @@ namespace Carpooling.Services.Services
 
                 travel.ApplyingPassengers.Add(user);
                 this.dbContext.Travels.Update(travel);
-                this.dbContext.SaveChanges();
+                await this.dbContext.SaveChangesAsync();
             }
             else
             {
@@ -216,7 +217,7 @@ namespace Carpooling.Services.Services
             }
         }
 
-        public void AddPassenger(int userId, int driverId, int travelId)
+        public async Task AddPassengerAsync(int userId, int driverId, int travelId)
         {
             var travel = this.GetTravel(travelId);
 
@@ -235,7 +236,7 @@ namespace Carpooling.Services.Services
                     travel.Passengers.Add(passenger);
                     travel.ApplyingPassengers.Remove(passenger);
                     travel.FreeSpots -= 1;
-                    this.dbContext.SaveChanges();
+                    await this.dbContext.SaveChangesAsync();
                 }
                 else
                 {
@@ -249,35 +250,35 @@ namespace Carpooling.Services.Services
 
         }
 
-        public void MarkAsComplete(int travelId)
+        public async Task MarkAsCompleteAsync(int travelId)
         {
             var travel = this.GetTravel(travelId);
             this.IsTravelCompleted(travel);
             travel.IsCompleted = true;
             this.dbContext.Travels.Update(travel);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void CancelTrip(int travelId)
+        public async Task CancelTripAsync(int travelId)
         {
             var travel = this.GetTravel(travelId);
             this.IsTravelCompleted(travel);
             this.dbContext.Travels.Remove(travel);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void RejectPassenger(int userId, int driverId, int travelId)
+        public async Task RejectPassengerAsync(int userId, int driverId, int travelId)
         {
             this.IsDriverAssigned(travelId, driverId);
-            this.RemovePassenger(userId, travelId);
+            await this.RemovePassengerAsync(userId, travelId);
         }
 
-        public void CancelParticipation(int passengerId, int travelId)
+        public async Task CancelParticipationAsync(int passengerId, int travelId)
         {
-            this.RemovePassenger(passengerId, travelId);
+            await this.RemovePassengerAsync(passengerId, travelId);
         }
 
-        private void RemovePassenger(int userId, int travelId)
+        private async Task RemovePassengerAsync(int userId, int travelId)
         {
             var travel = this.GetTravel(travelId);
             this.IsTravelCompleted(travel);
@@ -287,7 +288,7 @@ namespace Carpooling.Services.Services
             if (applyingPassenger != null)
             {
                 travel.ApplyingPassengers.Remove(applyingPassenger);
-                this.dbContext.SaveChanges();
+                await this.dbContext.SaveChangesAsync();
                 return;
             }
 
@@ -297,7 +298,7 @@ namespace Carpooling.Services.Services
             {
                 travel.Passengers.Remove(passenger);
                 travel.FreeSpots += 1;
-                this.dbContext.SaveChanges();
+                await this.dbContext.SaveChangesAsync();
                 return;
             }
             

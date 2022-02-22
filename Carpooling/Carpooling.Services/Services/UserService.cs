@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Carpooling.Data;
 using Carpooling.Data.Models;
 using Carpooling.Data.Models.Enums;
@@ -28,7 +29,7 @@ namespace Carpooling.Services.Services
             }
         }
 
-        public UserPresentDTO Create(UserCreateDTO userDTO)
+        public async Task<UserPresentDTO> CreateAsync(UserCreateDTO userDTO)
         {
             this.IsUserUnique(userDTO.Username, userDTO.Email, userDTO.PhoneNumber);
             var user = userDTO.ToUser();
@@ -36,17 +37,17 @@ namespace Carpooling.Services.Services
             user.UserStatus = UserStatus.Active;
             user.ProfilePictureName = "defaultProfilePicture.png";
             user.Roles.Add(role);
-            this.dbContext.Users.Add(user);
-            this.dbContext.SaveChanges();
+            await this.dbContext.Users.AddAsync(user);  
+            await this.dbContext.SaveChangesAsync();
 
             return user.ToUserDTO();
         }
 
-        public UserPresentDTO Delete(int id)
+        public async Task<UserPresentDTO> DeleteAsync(int id)
         {
             var tobeDeleted = this.GetUser(id);
             this.dbContext.Users.Remove(tobeDeleted);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
 
             return tobeDeleted.ToUserDTO();
         }
@@ -65,7 +66,7 @@ namespace Carpooling.Services.Services
             return result.Select(user => user.ToUserDTO());
         }
 
-        public UserPresentDTO Update(int id, UserCreateDTO updateUser)
+        public async Task<UserPresentDTO> UpdateAsync(int id, UserCreateDTO updateUser)
         {
             var user = this.GetUser(id);
 
@@ -100,7 +101,7 @@ namespace Carpooling.Services.Services
             }
 
             this.dbContext.Users.Update(user);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
 
             return user.ToUserDTO();
         }
@@ -127,8 +128,8 @@ namespace Carpooling.Services.Services
 
         public IEnumerable<UserPresentDTO> GetTop10Passengers()
         {
-            return this.UsersQuerry.Where(user => user.RatingAsPassanger > 0)
-                                   .OrderByDescending(user => user.RatingAsPassanger)
+            return this.UsersQuerry.Where(user => user.RatingAsPassenger > 0)
+                                   .OrderByDescending(user => user.RatingAsPassenger)
                                    .Take(10)
                                    .Select(user => user.ToUserDTO());
         }
@@ -138,20 +139,20 @@ namespace Carpooling.Services.Services
             return this.FilterUsers(phoneNumber, username, email).Select(user => user.ToUserDTO());
         }
 
-        public void BlockUser(int id)
+        public async Task BlockUserAsync(int id)
         {
             var user = this.GetUser(id);
             user.UserStatus = UserStatus.Blocked;
             this.dbContext.Users.Update(user);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
-        public void UnblockUser(int id)
+        public async Task UnblockUserAsync(int id)
         {
             var user = this.GetUser(id);
             user.UserStatus = UserStatus.Active;
             this.dbContext.Users.Update(user);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
         public void IsUserUnique(string username, string email, string phoneNumber)
@@ -172,7 +173,7 @@ namespace Carpooling.Services.Services
             }
         }
 
-        public void UpdateUserRating(int id, FeedbackType feedbackType)
+        public async Task UpdateUserRatingAsync(int id, FeedbackType feedbackType)
         {
             var user = this.GetUser(id);
 
@@ -180,7 +181,7 @@ namespace Carpooling.Services.Services
             {
                 var ratings = user.RecievedFeedbacks.Where(feedbacks => feedbacks.Type == FeedbackType.Driver).Select(feedback => feedback.Rating);
                 var average = ratings.Average();
-                user.RatingAsPassanger = average;
+                user.RatingAsPassenger = average;
             }
             else
             {
@@ -190,7 +191,7 @@ namespace Carpooling.Services.Services
             }
 
             this.dbContext.Update(user);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
         }
 
         private IEnumerable<User> FilterUsers(string phoneNumber, string username, string email)

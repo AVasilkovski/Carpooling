@@ -3,6 +3,7 @@ using Carpooling.Services.DTOs;
 using Carpooling.Services.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.UserTests
 {
@@ -27,7 +28,7 @@ namespace Carpooling.Tests.Tests.UserTests
         }
 
         [TestMethod]
-        public void CreateUser_When_ParamsAreValid()
+        public async Task CreateUser_When_ParamsAreValid()
         {
             var user = new UserCreateDTO()
             {
@@ -44,7 +45,7 @@ namespace Carpooling.Tests.Tests.UserTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new UserService(assertContext);
-                var actual = sut.Create(user);
+                var actual = await sut.CreateAsync(user);
                 Assert.AreEqual(expected.Username, actual.Username);
                 Assert.AreEqual(expected.Email, actual.Email);
                 Assert.AreEqual(expected.FirstName, actual.FirstName);

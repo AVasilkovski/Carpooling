@@ -4,6 +4,7 @@ using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers
 {
@@ -46,7 +47,7 @@ namespace Carpooling.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(FeedbackCreateViewModel feedbackCreateViewModel, int userToId, int travelId)
+        public async Task<IActionResult> Create(FeedbackCreateViewModel feedbackCreateViewModel, int userToId, int travelId)
         {
             if (!this.ModelState.IsValid)
             {
@@ -68,7 +69,7 @@ namespace Carpooling.Web.Controllers
                 feedback.Type = Data.Models.Enums.FeedbackType.Passenger;
             }
 
-            this.feedbackService.Create(feedback);
+            await this.feedbackService.CreateAsync(feedback);
             return RedirectToAction("Participants", "MyTravels", new { id = travelId });
         }
     }

@@ -1,11 +1,12 @@
 ﻿using Carpooling.Data.Models;
+using System.Threading.Tasks;
 
 namespace Carpooling.Services.Services.Contracts
 {
     public interface ICityService
     {
-        City CreateCity(string city);
+        Task<City> CreateCityAsync(string city);
 
-        City CheckIfCityExist(string city);
+        Task<City> CheckIfCityExistAsync(string city);
     }
 }

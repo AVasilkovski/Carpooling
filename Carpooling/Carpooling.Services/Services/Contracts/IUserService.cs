@@ -1,6 +1,7 @@
 ﻿using Carpooling.Data.Models.Enums;
 using Carpooling.Services.DTOs;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Carpooling.Services.Services.Contracts
 {
@@ -10,12 +11,13 @@ namespace Carpooling.Services.Services.Contracts
 
         UserPresentDTO Get(int id);
 
-        UserPresentDTO Create(UserCreateDTO user);
+        Task<UserPresentDTO> CreateAsync(UserCreateDTO user);
 
         // UserCreateDTO Update(int id, UserCreateDTO updateUser);
 
-        UserPresentDTO Update(int id, UserCreateDTO updateUser);
-        UserPresentDTO Delete(int id);
+        Task<UserPresentDTO> UpdateAsync(int id, UserCreateDTO updateUser);
+
+        Task<UserPresentDTO> DeleteAsync(int id);
 
         UserPresentDTO GetUserByCredentials(string username, string password);
 
@@ -25,12 +27,12 @@ namespace Carpooling.Services.Services.Contracts
 
         IEnumerable<UserPresentDTO> GetFilteredUsers(string phoneNumber, string username, string email);
 
-        void BlockUser(int id);
+        Task BlockUserAsync(int id);
 
-        void UnblockUser(int id);
+        Task UnblockUserAsync(int id);
 
         void IsUserUnique(string username, string email, string phoneNumber);
 
-        void UpdateUserRating(int id, FeedbackType feedbackType);
+        Task UpdateUserRatingAsync(int id, FeedbackType feedbackType);
     }
 }

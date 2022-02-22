@@ -45,7 +45,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "goshProfilePic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 5,
-                    RatingAsPassanger = 5
+                    RatingAsPassenger = 5
                 }, // user 1 
                 new User()
                 {
@@ -59,7 +59,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "wrestlerProfilePic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 4.9,
-                    RatingAsPassanger = 4.9
+                    RatingAsPassenger = 4.9
                 }, // user 2 
                 new User()
                 {
@@ -73,7 +73,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "invisiblemanProfilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 4.5,
-                    RatingAsPassanger = 4.5
+                    RatingAsPassenger = 4.5
                 }, // user 3
                 new User()
                 {
@@ -87,7 +87,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "itsmartoProfilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 5,
-                    RatingAsPassanger = 3
+                    RatingAsPassenger = 3
                 }, // user 4
                 new User()
                 {
@@ -101,7 +101,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "SashkoBeatsProfilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 0,
-                    RatingAsPassanger = 4.7
+                    RatingAsPassenger = 4.7
                 }, // user 5
                 new User()
                 {
@@ -115,7 +115,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "lilka405Profile.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 0,
-                    RatingAsPassanger = 4.1
+                    RatingAsPassenger = 4.1
                 }, // user 6
                 new User()
                 {
@@ -129,7 +129,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "emilia85Profilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 0,
-                    RatingAsPassanger = 5
+                    RatingAsPassenger = 5
                 }, // user 7
                 new User()
                 {
@@ -143,7 +143,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "grigs45Profilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 5,
-                    RatingAsPassanger = 3.3
+                    RatingAsPassenger = 3.3
                 }, // user 8
                 new User()
                 {
@@ -157,7 +157,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "saintpafProfilepic.jpeg",
                     UserStatus = UserStatus.Blocked,
                     RatingAsDriver = 0,
-                    RatingAsPassanger = 2.5
+                    RatingAsPassenger = 2.5
                 }, // user 9, blocked
                 new User()
                 {
@@ -171,7 +171,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "kriso29ProfilePic.jpg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 5,
-                    RatingAsPassanger = 3.1
+                    RatingAsPassenger = 3.1
                 }, // user 10
                 new User()
                 {
@@ -185,7 +185,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "partymanProfilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 0,
-                    RatingAsPassanger = 3.9
+                    RatingAsPassenger = 3.9
                 }, // user 11
                 new User()
                 {
@@ -199,7 +199,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "admin1Profilepic.jpg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 0,
-                    RatingAsPassanger = 0
+                    RatingAsPassenger = 0
                 }, // admin 12
                 new User()
                 {
@@ -213,7 +213,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "coconutmaster72Profilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 0,
-                    RatingAsPassanger = 0
+                    RatingAsPassenger = 0
                 }, // admin 13
                 new User()
                 {
@@ -227,7 +227,7 @@ namespace Carpooling.Data
                     ProfilePictureName = "demoUserProfilepic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 5,
-                    RatingAsPassanger = 4.5
+                    RatingAsPassenger = 4.5
                 }, // stamat a.k.a. user for demo
             };
             Travels = new List<Travel>()
@@ -677,7 +677,7 @@ namespace Carpooling.Data
                                                                   new { UsersId = 12, RolesId = 2 },
                                                                   new { UsersId = 13, RolesId = 2 },
                                                                   new { UsersId = 14, RolesId = 1 }));
-            // many to many between users and travels in which they are passangers
+            // many to many between users and travels in which they are passengers
             modelBuilder.Entity<User>()
                         .HasMany(user => user.TravelsAsPassenger)
                         .WithMany(travel => travel.Passengers)

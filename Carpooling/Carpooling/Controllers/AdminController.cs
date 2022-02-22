@@ -3,6 +3,7 @@ using Carpooling.Web.Helpers;
 using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers
 {
@@ -29,16 +30,16 @@ namespace Carpooling.Web.Controllers
             return View(users);
         }
 
-        public IActionResult Block(int id)
+        public async Task<IActionResult> Block(int id)
         {
-            this.userService.BlockUser(id);
+            await this.userService.BlockUserAsync(id);
             return this.RedirectToAction("Users", "admin");
         }
 
 
-        public IActionResult Unblock(int id)
+        public async Task<IActionResult> Unblock(int id)
         {
-            this.userService.UnblockUser(id);
+            await this.userService.UnblockUserAsync(id);
             return this.RedirectToAction("Users", "admin");
         }
 
