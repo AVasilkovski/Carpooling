@@ -38,9 +38,9 @@ namespace Carpooling.Tests.Tests.CityTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new CityService(assertContext);
-                var actual = sut.CheckIfCityExist(cityName);
+                var actual = sut.CheckIfCityExistAsync(cityName);
                 Assert.AreEqual(expected.Id, actual.Id);
-                Assert.AreEqual(expected.Name, actual.Name);
+                Assert.AreEqual(expected.Name, actual.Result.Name);
             }
         }
 
@@ -57,9 +57,9 @@ namespace Carpooling.Tests.Tests.CityTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new CityService(assertContext);
-                var actual = sut.CheckIfCityExist(cityName);
+                var actual = sut.CheckIfCityExistAsync(cityName);
                 Assert.AreEqual(expected.Id, actual.Id);
-                Assert.AreEqual(expected.Name, actual.Name);
+                Assert.AreEqual(expected.Name, actual.Result.Name);
             }
         }
     }

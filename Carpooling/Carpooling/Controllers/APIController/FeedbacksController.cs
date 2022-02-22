@@ -4,6 +4,7 @@ using Carpooling.Web.Models.APIModel;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers.APIController
 {
@@ -61,14 +62,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteFeedback([FromHeader] string userName, [FromHeader] string password, int id)
+        public async Task<IActionResult> DeleteFeedback([FromHeader] string userName, [FromHeader] string password, int id)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "Admin"))
                 {
-                    this.feedbackService.Delete(id);
+                    await this.feedbackService.DeleteAsync(id);
                     return this.NoContent();
                 }
                 return BadRequest();
@@ -120,7 +121,7 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPost("")]
-        public IActionResult CreateFeedback([FromHeader] string userName, [FromHeader] string password, [FromBody] FeedbackRequestModel feedbackToBeCreated)
+        public async Task<IActionResult> CreateFeedback([FromHeader] string userName, [FromHeader] string password, [FromBody] FeedbackRequestModel feedbackToBeCreated)
         {
             try
             {
@@ -128,7 +129,8 @@ namespace Carpooling.Web.Controllers.APIController
                 if (user.Roles.Any(role => role == "User" && user.Id == feedbackToBeCreated.UserFromId))
                 {
                     var feedback = feedbackToBeCreated.FeedbackRequestModel();
-                    var result = this.feedbackService.Create(feedback).FeedbackResponseModel();
+                    var createdFeedback = await this.feedbackService.CreateAsync(feedback);
+                    var result = createdFeedback.FeedbackResponseModel();
                     return this.Created("New Travel", result);
                 }
                 return this.BadRequest();

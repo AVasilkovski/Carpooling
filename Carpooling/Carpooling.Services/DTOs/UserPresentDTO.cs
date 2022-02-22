@@ -22,7 +22,7 @@ namespace Carpooling.Services.DTOs
             this.ProfilePic = user.ProfilePictureName;
             this.Status = user.UserStatus;
             this.Roles = roles;
-            this.RatingAsPassenger = user.RatingAsPassanger;
+            this.RatingAsPassenger = user.RatingAsPassenger;
             this.RatingAsDriver = user.RatingAsDriver;
         }
 

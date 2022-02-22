@@ -3,6 +3,7 @@ using Carpooling.Data.Models.Enums;
 using Carpooling.Services.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.UserTests
 {
@@ -28,7 +29,7 @@ namespace Carpooling.Tests.Tests.UserTests
         }
 
         [TestMethod]
-        public void CalculateRatingAsPassenger_When_ParamsAreValid()
+        public async Task CalculateRatingAsPassenger_When_ParamsAreValid()
         {
             int userId = 1;
             var feedbackType = FeedbackType.Driver;
@@ -36,14 +37,14 @@ namespace Carpooling.Tests.Tests.UserTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new UserService(assertContext);
-                sut.UpdateUserRating(userId, feedbackType);
+                await sut.UpdateUserRatingAsync(userId, feedbackType);
                 var actual = sut.Get(userId);
                 Assert.AreEqual(expected, actual.RatingAsPassenger);
             }
         }
 
         [TestMethod]
-        public void CalculateRatingAsDriver_When_ParamsAreValid()
+        public async Task CalculateRatingAsDriver_When_ParamsAreValid()
         {
 
             int userId = 1;
@@ -52,7 +53,7 @@ namespace Carpooling.Tests.Tests.UserTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new UserService(assertContext);
-                sut.UpdateUserRating(userId, feedbackType);
+                await sut.UpdateUserRatingAsync(userId, feedbackType);
                 var actual = sut.Get(userId);
                 Assert.AreEqual(expected, actual.RatingAsDriver);
             }

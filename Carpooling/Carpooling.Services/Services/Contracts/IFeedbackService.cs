@@ -1,6 +1,7 @@
 ﻿using Carpooling.Services.DTOs;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Services.Services.Contracts
 {
@@ -10,9 +11,9 @@ namespace Carpooling.Services.Services.Contracts
 
         FeedbackPresentDTO Get(int id);
 
-        FeedbackPresentDTO Create(FeedbackCreateDTO feedbackCreateDTO);
+        Task<FeedbackPresentDTO> CreateAsync(FeedbackCreateDTO feedbackCreateDTO);
 
-        FeedbackPresentDTO Delete(int id);
+        Task<FeedbackPresentDTO> DeleteAsync(int id);
 
         IEnumerable<FeedbackPresentDTO> SearchUserRecievedFeedbacks(int userId, string username, double? rating, bool ratingSort);
 

@@ -52,7 +52,7 @@ namespace Carpooling.Tests.Tests.UserTests
                     Assert.AreEqual(expected.ProfilePictureName, actual.ProfilePic);
                     Assert.AreEqual(expected.UserStatus, actual.Status);
                     Assert.AreEqual(expected.RatingAsDriver, actual.RatingAsDriver);
-                    Assert.AreEqual(expected.RatingAsPassanger, actual.RatingAsPassenger);
+                    Assert.AreEqual(expected.RatingAsPassenger, actual.RatingAsPassenger);
                 }
             }
         }

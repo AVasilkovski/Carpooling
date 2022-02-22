@@ -5,6 +5,7 @@ using Carpooling.Services.Services.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -32,7 +33,7 @@ namespace Carpooling.Tests.Tests.TravelTests
         }
 
         [TestMethod]
-        public void CancelTripCorrectly_When_ParamsAreValid()
+        public async Task CancelTripCorrectly_When_ParamsAreValid()
         {
             var travelId = 1;
             var travelTagService = new Mock<ITravelTagService>();
@@ -40,7 +41,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                sut.CancelTrip(travelId);
+                await sut.CancelTripAsync(travelId);
                 Assert.ThrowsException<EntityNotFoundException>(() => sut.Get(travelId));
             }
         }

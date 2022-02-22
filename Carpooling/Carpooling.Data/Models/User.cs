@@ -35,7 +35,7 @@ namespace Carpooling.Data.Models
 
         public double RatingAsDriver { get; set; }
 
-        public double RatingAsPassanger { get; set; }
+        public double RatingAsPassenger { get; set; }
 
         public ICollection<Role> Roles { get; set; } = new List<Role>();
 

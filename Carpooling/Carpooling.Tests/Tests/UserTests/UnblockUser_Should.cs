@@ -4,6 +4,7 @@ using Carpooling.Services.DTOs;
 using Carpooling.Services.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.UserTests
 {
@@ -29,7 +30,7 @@ namespace Carpooling.Tests.Tests.UserTests
         }
 
         [TestMethod]
-        public void UnblockUser_When_ParamsAreValid()
+        public async Task UnblockUser_When_ParamsAreValid()
         {
             var id = 9;
             var expected = new UserPresentDTO()
@@ -49,7 +50,7 @@ namespace Carpooling.Tests.Tests.UserTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new UserService(assertContext);
-                sut.UnblockUser(id);
+                await sut.UnblockUserAsync(id);
                 var actual = sut.Get(id);
                 Assert.AreEqual(expected.Id, actual.Id);
                 Assert.AreEqual(expected.Username, actual.Username);

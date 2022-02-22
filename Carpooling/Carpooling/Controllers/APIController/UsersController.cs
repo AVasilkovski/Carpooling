@@ -4,6 +4,7 @@ using Carpooling.Web.Models.APIModel;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers.APIController
 {
@@ -61,12 +62,13 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPost("")]
-        public IActionResult CreateUser([FromBody] UserRequestModel userRequestModel)//
+        public async Task<IActionResult> CreateUser([FromBody] UserRequestModel userRequestModel)//
         {
             try
             {
                 var user = userRequestModel.UserRequestModel();
-                var result = this.userService.Create(user).UserResponseModel();
+                var createdUser = await this.userService.CreateAsync(user);
+                var result = createdUser.UserResponseModel();
                 return this.Created("New Customer", result);
             }
             catch (ArgumentNullException)
@@ -76,7 +78,7 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateUser([FromHeader] string credentials, [FromHeader] string password, [FromBody] UserRequestModel userRequestModel, int userId)
+        public async Task<IActionResult> UpdateUser([FromHeader] string credentials, [FromHeader] string password, [FromBody] UserRequestModel userRequestModel, int userId)
         {
             try
             {
@@ -84,7 +86,7 @@ namespace Carpooling.Web.Controllers.APIController
                 if (user.Roles.Any(role => role == "User" && user.Id == userId))
                 {
                     var userToBeModified = userRequestModel.UserRequestModel();
-                    var updatedUser = this.userService.Update(userId, userToBeModified);
+                    var updatedUser = await this.userService.UpdateAsync(userId, userToBeModified);
                     var result = updatedUser.UserResponseModel();
                     return this.Ok(result);
                 }
@@ -98,14 +100,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteUser([FromHeader] string userName, [FromHeader] string password, int id)
+        public async Task<IActionResult> DeleteUser([FromHeader] string userName, [FromHeader] string password, int id)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "Admin" && user.Id == id))
                 {
-                    this.userService.Delete(id);
+                    await this.userService.DeleteAsync(id);
                     return this.NoContent();
                 }
                 return BadRequest();
@@ -117,14 +119,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("{userId}/Block")]
-        public IActionResult BlockUser([FromHeader] string userName, [FromHeader] string password, int userId)
+        public async Task<IActionResult> BlockUser([FromHeader] string userName, [FromHeader] string password, int userId)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Contains("Admin") && user.Id != userId && !this.userService.Get(userId).Roles.Contains("Admin"))
                 {
-                    this.userService.BlockUser(userId);
+                    await this.userService.BlockUserAsync(userId);
                     return this.Ok();
                 }
                 return this.BadRequest();
@@ -136,14 +138,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("{userId}/Unblock")]
-        public IActionResult UnblockUser([FromHeader] string userName, [FromHeader] string password, int userId)
+        public async Task<IActionResult> UnblockUser([FromHeader] string userName, [FromHeader] string password, int userId)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Contains("Admin") && user.Id != userId && !this.userService.Get(userId).Roles.Contains("Admin"))
                 {
-                    this.userService.UnblockUser(userId);
+                    await this.userService.UnblockUserAsync(userId);
                     return this.Ok();
                 }
                 return this.BadRequest();

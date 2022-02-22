@@ -33,8 +33,8 @@ namespace Carpooling.Tests.Tests.UserTests
         {
             using (var assertContext = new CarpoolingContext(this.options))
             {
-                var expectedPassengers = assertContext.Users.Where(user => user.RatingAsPassanger > 0)
-                                                  .OrderByDescending(user => user.RatingAsPassanger)
+                var expectedPassengers = assertContext.Users.Where(user => user.RatingAsPassenger > 0)
+                                                  .OrderByDescending(user => user.RatingAsPassenger)
                                                   .Take(10)
                                                   .ToList();
 
@@ -53,7 +53,7 @@ namespace Carpooling.Tests.Tests.UserTests
                     Assert.AreEqual(expected.ProfilePictureName, actual.ProfilePic);
                     Assert.AreEqual(expected.UserStatus, actual.Status);
                     Assert.AreEqual(expected.RatingAsDriver, actual.RatingAsDriver);
-                    Assert.AreEqual(expected.RatingAsPassanger, actual.RatingAsPassenger);
+                    Assert.AreEqual(expected.RatingAsPassenger, actual.RatingAsPassenger);
                 }
             }
         }

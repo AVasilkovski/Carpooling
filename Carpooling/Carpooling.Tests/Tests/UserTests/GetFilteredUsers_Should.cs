@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.UserTests
 {
@@ -30,7 +31,7 @@ namespace Carpooling.Tests.Tests.UserTests
         }
 
         [TestMethod]
-        public void ReturnUsers_When_ParamsAreValid()
+        public async Task ReturnUsers_When_ParamsAreValidAsync()
         {
             var user1 = new UserCreateDTO()
             {
@@ -60,8 +61,8 @@ namespace Carpooling.Tests.Tests.UserTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new UserService(assertContext);
-                sut.Create(user1);
-                sut.Create(user2);
+                await sut.CreateAsync(user1);
+                await sut.CreateAsync(user2);
                 var actualUsers = sut.GetFilteredUsers("0", "o", "o").ToList();
                 for (int i = 0; i < expectedUsers.Count; i++)
                 {

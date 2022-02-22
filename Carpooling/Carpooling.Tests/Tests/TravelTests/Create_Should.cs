@@ -8,6 +8,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -35,7 +36,7 @@ namespace Carpooling.Tests.Tests.TravelTests
         }
 
         [TestMethod]
-        public void CreateTravel_When_ParamsAreValid()
+        public async Task CreateTravel_When_ParamsAreValid()
         {
             var travelTagService = new Mock<ITravelTagService>();
             var cityService = new Mock<ICityService>();
@@ -64,14 +65,14 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
                 travelTagService.Setup(tagService => tagService.FindTags(It.IsAny<IEnumerable<string>>()))
                                 .Returns(assertContext.TravelTags.ToList());
-                cityService.SetupSequence(cities => cities.CheckIfCityExist(It.IsAny<string>()))
-                           .Returns(assertContext.Cities.Take(1).First())
-                           .Returns(assertContext.Cities.Skip(1).Take(1).First());
+                cityService.SetupSequence(cities => cities.CheckIfCityExistAsync(It.IsAny<string>()))
+                           .Returns(assertContext.Cities.Take(1).FirstAsync())
+                           .Returns(assertContext.Cities.Skip(1).Take(1).FirstAsync());
 
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
                 var userService = new UserService(assertContext);
-                userService.Create(user);
-                var actual = sut.Create(travel);
+                await userService.CreateAsync(user);
+                var actual = await sut.CreateAsync(travel);
                 Assert.AreEqual(expected.DepartureTime, actual.DepartureTime);
                 Assert.AreEqual(expected.FreeSpots, actual.FreeSpots);
             }

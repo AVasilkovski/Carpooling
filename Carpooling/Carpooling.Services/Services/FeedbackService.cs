@@ -6,6 +6,7 @@ using Carpooling.Data.Models;
 using Carpooling.Services.DTOs;
 using Carpooling.Services.Services.Contracts;
 using Carpooling.Services.Exceptions;
+using System.Threading.Tasks;
 
 namespace Carpooling.Services.Services
 {
@@ -43,22 +44,22 @@ namespace Carpooling.Services.Services
             return feedback.ToFeedbackDTO();
         }
 
-        public FeedbackPresentDTO Create(FeedbackCreateDTO feedbackCreateDTO)
+        public async Task<FeedbackPresentDTO> CreateAsync(FeedbackCreateDTO feedbackCreateDTO)
         {
-            this.userService.UpdateUserRating(feedbackCreateDTO.UserToId, feedbackCreateDTO.Type);
+            await this.userService.UpdateUserRatingAsync(feedbackCreateDTO.UserToId, feedbackCreateDTO.Type);
             var feedback = feedbackCreateDTO.ToFeedback();
-            this.dbContext.Feedbacks.Add(feedback);
-            this.dbContext.SaveChanges();
+            await this.dbContext.Feedbacks.AddAsync(feedback);
+            await this.dbContext.SaveChangesAsync();
             feedback = this.GetFeedback(feedback.Id);
 
             return feedback.ToFeedbackDTO();
         }
 
-        public FeedbackPresentDTO Delete(int id)
+        public async Task<FeedbackPresentDTO> DeleteAsync(int id)
         {
             var feedback = this.GetFeedback(id);
             this.dbContext.Feedbacks.Remove(feedback);
-            this.dbContext.SaveChanges();
+            await this.dbContext.SaveChangesAsync();
 
             return feedback.ToFeedbackDTO();
         }

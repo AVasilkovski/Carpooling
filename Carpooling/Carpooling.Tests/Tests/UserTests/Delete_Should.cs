@@ -4,6 +4,7 @@ using Carpooling.Services.DTOs;
 using Carpooling.Services.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.UserTests
 {
@@ -29,7 +30,7 @@ namespace Carpooling.Tests.Tests.UserTests
         }
 
         [TestMethod]
-        public void DeleteUser_When_ParamsAreValid()
+        public async Task DeleteUser_When_ParamsAreValid()
         {
             var id = 15;
             var user = new UserCreateDTO()
@@ -60,8 +61,8 @@ namespace Carpooling.Tests.Tests.UserTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new UserService(assertContext);
-                sut.Create(user);
-                var actual = sut.Delete(id);
+                await sut.CreateAsync(user);
+                var actual = await sut.DeleteAsync(id);
                 Assert.AreEqual(expected.Id, actual.Id);
                 Assert.AreEqual(expected.Username, actual.Username);
                 Assert.AreEqual(expected.FirstName, actual.FirstName);

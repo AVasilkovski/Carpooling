@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -43,7 +44,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
 
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<TravelException>(() => sut.ApplyAsPassenger(userId, travelId));
+                Assert.ThrowsException<TravelException>(() => sut.ApplyAsPassengerAsync(userId, travelId));
             }
         }
 
@@ -58,7 +59,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
 
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<EntityNotFoundException>(() => sut.ApplyAsPassenger(userId, travelId));
+                Assert.ThrowsException<EntityNotFoundException>(() => sut.ApplyAsPassengerAsync(userId, travelId));
             }
         }
 
@@ -73,12 +74,12 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
 
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<TravelException>(() => sut.ApplyAsPassenger(userId, travelId));
+                Assert.ThrowsException<TravelException>(() => sut.ApplyAsPassengerAsync(userId, travelId));
             }
         }
 
         [TestMethod]
-        public void ApplyUser_When_ParamsAreValid()
+        public async Task ApplyUser_When_ParamsAreValid()
         {
             var userId = 6;
             var travelId = 1;
@@ -88,7 +89,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                sut.ApplyAsPassenger(userId, travelId);
+                await sut.ApplyAsPassengerAsync(userId, travelId);
                 var actual = sut.Get(travelId).ApplyingPassengers.Count();
                 Assert.AreEqual(expected, actual);
             }

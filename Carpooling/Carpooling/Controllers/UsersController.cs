@@ -5,6 +5,7 @@ using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers
 {
@@ -33,7 +34,7 @@ namespace Carpooling.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Update(UserUpdateViewModel userUpdateViewModel)
+        public async Task<IActionResult> Update(UserUpdateViewModel userUpdateViewModel)
         {
             if (!this.ModelState.IsValid)
             {
@@ -57,7 +58,7 @@ namespace Carpooling.Web.Controllers
 
             var user = userUpdateViewModel.ToUserUpdate(profilePicture);
             var userId = int.Parse(this.HttpContext.Session.GetString("UserId"));
-            this.userService.Update(userId, user);
+            await this.userService.UpdateAsync(userId, user);
             return this.RedirectToAction("MyProfile", "Users", new { id = userId });
         }
     }

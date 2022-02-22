@@ -1,5 +1,6 @@
 ﻿using Carpooling.Services.DTOs;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Carpooling.Services.Services.Contracts
 {
@@ -7,25 +8,25 @@ namespace Carpooling.Services.Services.Contracts
     {
         IEnumerable<TravelPresentDTO> GetAll();
 
-        TravelPresentDTO Create(TravelCreateDTO newTravel);
+        Task<TravelPresentDTO> CreateAsync(TravelCreateDTO newTravel);
 
         TravelPresentDTO Get(int id);
 
-        TravelPresentDTO Update(int id, TravelCreateDTO travel);
+        Task<TravelPresentDTO> UpdateAsync(int id, TravelCreateDTO travel);
 
-        void Delete(int id);
+        Task DeleteAsync(int id);
 
-        void ApplyAsPassenger(int userId, int travelId);
+        Task ApplyAsPassengerAsync(int userId, int travelId);
 
-        void AddPassenger(int userId, int driverId, int travelId);
+        Task AddPassengerAsync(int userId, int driverId, int travelId);
 
-        void RejectPassenger(int userId, int driverId, int travelId);
+        Task RejectPassengerAsync(int userId, int driverId, int travelId);
 
-        void MarkAsComplete(int travelId);
+        Task MarkAsCompleteAsync(int travelId);
 
-        void CancelTrip(int travelId);
+        Task CancelTripAsync(int travelId);
 
-        void CancelParticipation(int passengerId, int travelId);
+        Task CancelParticipationAsync(int passengerId, int travelId);
 
         IEnumerable<TravelPresentDTO> SearchAllTravels(string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots);
 

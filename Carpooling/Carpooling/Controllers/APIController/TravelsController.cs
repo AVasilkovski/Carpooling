@@ -5,6 +5,7 @@ using Carpooling.Web.Models.APIModel;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Controllers.APIController
 {
@@ -42,7 +43,6 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpGet("")]
-
         public IActionResult Get([FromHeader] string userName, [FromHeader] string password)
         {
             try
@@ -60,8 +60,7 @@ namespace Carpooling.Web.Controllers.APIController
                 return this.NotFound(e);
             }
         }
-
-        // api/Travels/{username}/Approved
+        
         [HttpGet("{username}/Approved")]
         public IActionResult SearchApprovedTravels([FromHeader] string userName, [FromHeader] string password, string destinationCity, string startCity, string driverName,
                                                int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -82,8 +81,7 @@ namespace Carpooling.Web.Controllers.APIController
                 return this.NotFound(e);
             }
         }
-
-        // api/Travels/{username}/Applied
+        
         [HttpGet("{username}/Applied")]
         public IActionResult SortAppliedTravels([FromHeader] string userName, [FromHeader] string password, string destinationCity, string startCity, string driverName,
                                              int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -104,8 +102,7 @@ namespace Carpooling.Web.Controllers.APIController
                 return this.NotFound(e);
             }
         }
-
-        // api/Travels/Drivers/{username}
+        
         [HttpGet("Drivers/{username}")]
         public IActionResult SearchAvailableTravels([FromHeader] string userName, [FromHeader] string password, string destinationCity, string startCity, int? freeSpots,
                                                     bool sortByDate, bool sortByFreeSpots)
@@ -126,8 +123,7 @@ namespace Carpooling.Web.Controllers.APIController
                 return this.NotFound(e);
             }
         }
-
-        // api/Travels/{usename}/Finished
+       
         [HttpGet("{username}/Finished")]
         public IActionResult SortFinishedTravels([FromHeader] string userName, [FromHeader] string password, string destinationCity, string startCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
@@ -147,8 +143,7 @@ namespace Carpooling.Web.Controllers.APIController
                 return this.NotFound(e);
             }
         }
-
-        // api/Travels/Search
+        
         [HttpGet("Search")]
         public IActionResult SearchAsAdmin([FromHeader] string userName, [FromHeader] string password, string destinationCity, string startCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
@@ -168,8 +163,7 @@ namespace Carpooling.Web.Controllers.APIController
                 return this.NotFound(e);
             }
         }
-
-        // api/Travels/Available
+        
         [HttpGet("Available")]
         public IActionResult SortAsAdmin([FromHeader] string userName, [FromHeader] string password, string destinationCity, string startCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
@@ -191,7 +185,7 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPost("")]
-        public IActionResult CreateTravel([FromHeader] string userName, [FromHeader] string password, [FromBody] TravelRequestModel travelToBeCreated)
+        public async Task<IActionResult> CreateTravel([FromHeader] string userName, [FromHeader] string password, [FromBody] TravelRequestModel travelToBeCreated)
         {
             try
             {
@@ -199,7 +193,9 @@ namespace Carpooling.Web.Controllers.APIController
                 if (user.Roles.Any(role => role == "User") && user.Status == UserStatus.Active)
                 {
                     var travel = travelToBeCreated.TravelRequestModel();
-                    var result = this.travelService.Create(travel).TravelResponseModel();
+                    var createdTravel = await this.travelService.CreateAsync(travel); 
+                    var result = createdTravel.TravelResponseModel();
+
                     return this.Created("New Travel", result);
                 }
                 return this.BadRequest();
@@ -211,7 +207,7 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("Update/{id}")]
-        public IActionResult UpdateTravel([FromHeader] string userName, [FromHeader] string password, int travelId, [FromBody] TravelRequestModel travelToUpdate)
+        public async Task<IActionResult> UpdateTravel([FromHeader] string userName, [FromHeader] string password, int travelId, [FromBody] TravelRequestModel travelToUpdate)
         {
             try
             {
@@ -219,7 +215,8 @@ namespace Carpooling.Web.Controllers.APIController
                 if (user.Roles.Any(role => role == "User"))
                 {
                     var travelDto = travelToUpdate.TravelRequestModel();
-                    var result = this.travelService.Update(travelId, travelDto).TravelResponseModel();
+                    var updatedTravel = await this.travelService.UpdateAsync(travelId, travelDto);
+                    var result = updatedTravel.TravelResponseModel();
 
                     return this.Ok(result);
                 }
@@ -232,14 +229,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteTravel([FromHeader] string userName, [FromHeader] string password, int id)
+        public async Task<IActionResult> DeleteTravel([FromHeader] string userName, [FromHeader] string password, int id)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "Admin"))
                 {
-                    this.travelService.Delete(id);
+                    await this.travelService.DeleteAsync(id);
                     return this.NoContent();
                 }
                 return BadRequest();
@@ -251,14 +248,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("{travelId}/Passenger/{userId}")]
-        public IActionResult AddPassenger([FromHeader] string userName, [FromHeader] string password, int userId, int travelId)
+        public async Task<IActionResult> AddPassenger([FromHeader] string userName, [FromHeader] string password, int userId, int travelId)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "User") && user.Status == UserStatus.Active)
                 {
-                    this.travelService.AddPassenger(userId, user.Id, travelId);
+                    await this.travelService.AddPassengerAsync(userId, user.Id, travelId);
                     return this.Ok();
                 }
                 return this.BadRequest();
@@ -270,14 +267,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("Complete/{id}")]
-        public IActionResult MarkAsComplete([FromHeader] string userName, [FromHeader] string password, int id)
+        public async Task<IActionResult> MarkAsComplete([FromHeader] string userName, [FromHeader] string password, int id)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "User"))
                 {
-                    this.travelService.MarkAsComplete(id);
+                    await this.travelService.MarkAsCompleteAsync(id);
                     return this.Ok();
                 }
                 return this.BadRequest();
@@ -289,14 +286,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpDelete("Cancel/{id}")]
-        public IActionResult CancelTrip([FromHeader] string userName, [FromHeader] string password, int id)
+        public async Task<IActionResult> CancelTrip([FromHeader] string userName, [FromHeader] string password, int id)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "User"))
                 {
-                    this.travelService.CancelTrip(id);
+                    await this.travelService.CancelTripAsync(id);
                     return this.Ok();
                 }
                 return this.BadRequest();
@@ -308,14 +305,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("{travelId}/Apply/{userName}")]
-        public IActionResult ApplyAsPassenger([FromHeader] string userName, [FromHeader] string password, int travelId)
+        public async Task<IActionResult> ApplyAsPassenger([FromHeader] string userName, [FromHeader] string password, int travelId)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "User") && user.Status == UserStatus.Active)
                 {
-                    this.travelService.ApplyAsPassenger(user.Id, travelId);
+                    await this.travelService.ApplyAsPassengerAsync(user.Id, travelId);
                     return this.Ok();
                 }
                 return this.BadRequest();
@@ -327,14 +324,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpPut("{travelId}/Reject/{userName}")]
-        public IActionResult RejectPassenger([FromHeader] string userName, [FromHeader] string password, int userId, int travelId)
+        public async Task<IActionResult> RejectPassenger([FromHeader] string userName, [FromHeader] string password, int userId, int travelId)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "User"))
                 {
-                    this.travelService.RejectPassenger(userId, user.Id, travelId);
+                    await this.travelService.RejectPassengerAsync(userId, user.Id, travelId);
                     return this.Ok();
                 }
                 return this.BadRequest();
@@ -347,14 +344,14 @@ namespace Carpooling.Web.Controllers.APIController
 
         [HttpPut("{travelId}/Cancel/{userName}")]
 
-        public IActionResult CancelParticipation([FromHeader] string userName, [FromHeader] string password, int travelId)
+        public async Task<IActionResult> CancelParticipation([FromHeader] string userName, [FromHeader] string password, int travelId)
         {
             try
             {
                 var user = this.authHelper.TryGetUser(userName, password);
                 if (user.Roles.Any(role => role == "User"))
                 {
-                    this.travelService.CancelParticipation(user.Id, travelId);
+                    await this.travelService.CancelParticipationAsync(user.Id, travelId);
                     return this.Ok($"Participation in travel with ID {travelId} canceled");
                 }
                 return this.BadRequest();

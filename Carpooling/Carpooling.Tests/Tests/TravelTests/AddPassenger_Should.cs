@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carpooling.Tests.Tests.TravelTests
 {
@@ -43,7 +44,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<TravelException>(() => sut.AddPassenger(userId, driverId, travelId));
+                Assert.ThrowsException<TravelException>(() => sut.AddPassengerAsync(userId, driverId, travelId));
             }
         }
 
@@ -58,7 +59,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<TravelException>(() => sut.AddPassenger(userId, driverId, travelId));
+                Assert.ThrowsException<TravelException>(() => sut.AddPassengerAsync(userId, driverId, travelId));
             }
         }
 
@@ -73,7 +74,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<TravelException>(() => sut.AddPassenger(userId, driverId, travelId));
+                Assert.ThrowsException<TravelException>(() => sut.AddPassengerAsync(userId, driverId, travelId));
             }
         }
 
@@ -88,7 +89,7 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<EntityNotFoundException>(() => sut.AddPassenger(userId, driverId, travelId));
+                Assert.ThrowsException<EntityNotFoundException>(() => sut.AddPassengerAsync(userId, driverId, travelId));
             }
         }
 
@@ -103,12 +104,12 @@ namespace Carpooling.Tests.Tests.TravelTests
             using (var assertContext = new CarpoolingContext(this.options))
             {
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                Assert.ThrowsException<EntityNotFoundException>(() => sut.AddPassenger(userId, driverId, travelId));
+                Assert.ThrowsException<EntityNotFoundException>(() => sut.AddPassengerAsync(userId, driverId, travelId));
             }
         }
 
         [TestMethod]
-        public void AddUser_When_ParamsAreValid()
+        public async Task AddUser_When_ParamsAreValid()
         {
             var userId = 5;
             var travelId = 3;
@@ -119,8 +120,8 @@ namespace Carpooling.Tests.Tests.TravelTests
             {
                 var expected = 1;
                 var sut = new TravelService(assertContext, travelTagService.Object, cityService.Object);
-                sut.ApplyAsPassenger(userId, travelId);
-                sut.AddPassenger(userId, driverId, travelId);
+                await sut.ApplyAsPassengerAsync(userId, travelId);
+                await sut.AddPassengerAsync(userId, driverId, travelId);
                 var acutal = sut.Get(travelId).Passengers.Count();
                 Assert.AreEqual(expected, acutal);
             }
