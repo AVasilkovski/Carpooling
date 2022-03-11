@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Helpers.Contracts
 {
     public interface IImageHelper
     {
-        public string UploadImage(IFormFile registerViewModel);
+        public Task<string> UploadImageAsync(IFormFile registerViewModel);
     }
 }

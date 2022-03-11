@@ -1,4 +1,6 @@
-﻿using Carpooling.Services.Exceptions;
+﻿using AutoMapper;
+using Carpooling.Services.DTOs;
+using Carpooling.Services.Exceptions;
 using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers.Contracts;
 using Carpooling.Web.Models;
@@ -12,11 +14,13 @@ namespace Carpooling.Web.Controllers
     {
         private readonly IUserService userService;
         private readonly IAuthHelper authHelper;
+        private readonly IMapper mapper;
 
-        public AuthenticationController(IUserService userService, IAuthHelper authHelper)
+        public AuthenticationController(IUserService userService, IAuthHelper authHelper, IMapper mapper)
         {
             this.userService = userService;
             this.authHelper = authHelper;
+            this.mapper = mapper;
         }
 
         public IActionResult Login()
@@ -27,7 +31,7 @@ namespace Carpooling.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login([Bind("Username", "Password")] LoginViewModel loginViewModel)
+        public async Task<IActionResult> Login([Bind("Username", "Password")] LoginViewModel loginViewModel)
         {
             if (!this.ModelState.IsValid)
             {
@@ -36,11 +40,11 @@ namespace Carpooling.Web.Controllers
 
             try
             {
-                var user = this.authHelper.TryGetUser(loginViewModel.Username, loginViewModel.Password);
+                var user = await this.authHelper.TryGetUserAsync(loginViewModel.Username, loginViewModel.Password);
                 this.HttpContext.Session.SetString("CurrentUser", user.Username);
-                this.HttpContext.Session.SetString("CurrentRoles", string.Join(',', user.Roles));
+                this.HttpContext.Session.SetString("CurrentRoles", string.Join(',', user.Role));
                 this.HttpContext.Session.SetString("UserId", user.Id.ToString());
-                this.HttpContext.Session.SetString("ProfilePicture", user.ProfilePic);
+                this.HttpContext.Session.SetString("ProfilePictureName", user.ProfilePictureName);
 
                 return this.RedirectToAction("index", "home");
             }
@@ -82,7 +86,7 @@ namespace Carpooling.Web.Controllers
                 return this.View(registerViewModel);
             }
 
-            var user = registerViewModel.ToUserCreateDTO();
+            var user = this.mapper.Map<UserCreateDTO>(registerViewModel);
             await this.userService.CreateAsync(user);
             return this.RedirectToAction(nameof(this.Login));
         }

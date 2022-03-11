@@ -42,6 +42,10 @@ namespace Carpooling.Data
                     Email = "gosho.t@gmail.com",
                     Password = "Randompass+12",
                     PhoneNumber = "0923425084",
+                    
+                    
+                    
+                    
                     ProfilePictureName = "goshProfilePic.jpeg",
                     UserStatus = UserStatus.Active,
                     RatingAsDriver = 5,
@@ -659,24 +663,24 @@ namespace Carpooling.Data
             modelBuilder.Entity<Feedback>().HasData(Feedbacks);
             // seeding many to many between users and roles
             modelBuilder.Entity<User>()
-                        .HasMany(user => user.Roles)
+                        .HasMany(user => user.Role)
                         .WithMany(role => role.Users)
-                        .UsingEntity(userRole => userRole.HasData(new { UsersId = 1, RolesId = 1 },
-                                                                  new { UsersId = 2, RolesId = 1 },
-                                                                  new { UsersId = 3, RolesId = 1 },
-                                                                  new { UsersId = 4, RolesId = 1 },
-                                                                  new { UsersId = 5, RolesId = 1 },
-                                                                  new { UsersId = 6, RolesId = 1 },
-                                                                  new { UsersId = 7, RolesId = 1 },
-                                                                  new { UsersId = 8, RolesId = 1 },
-                                                                  new { UsersId = 9, RolesId = 1 },
-                                                                  new { UsersId = 10, RolesId = 1 },
-                                                                  new { UsersId = 11, RolesId = 1 },
-                                                                  new { UsersId = 12, RolesId = 1 },
-                                                                  new { UsersId = 13, RolesId = 1 },
-                                                                  new { UsersId = 12, RolesId = 2 },
-                                                                  new { UsersId = 13, RolesId = 2 },
-                                                                  new { UsersId = 14, RolesId = 1 }));
+                        .UsingEntity(userRole => userRole.HasData(new { UsersId = 1, RoleId = 1 },
+                                                                  new { UsersId = 2, RoleId = 1 },
+                                                                  new { UsersId = 3, RoleId = 1 },
+                                                                  new { UsersId = 4, RoleId = 1 },
+                                                                  new { UsersId = 5, RoleId = 1 },
+                                                                  new { UsersId = 6, RoleId = 1 },
+                                                                  new { UsersId = 7, RoleId = 1 },
+                                                                  new { UsersId = 8, RoleId = 1 },
+                                                                  new { UsersId = 9, RoleId = 1 },
+                                                                  new { UsersId = 10, RoleId = 1 },
+                                                                  new { UsersId = 11, RoleId = 1 },
+                                                                  new { UsersId = 12, RoleId = 1 },
+                                                                  new { UsersId = 13, RoleId = 1 },
+                                                                  new { UsersId = 12, RoleId = 2 },
+                                                                  new { UsersId = 13, RoleId = 2 },
+                                                                  new { UsersId = 14, RoleId = 1 }));
             // many to many between users and travels in which they are passengers
             modelBuilder.Entity<User>()
                         .HasMany(user => user.TravelsAsPassenger)

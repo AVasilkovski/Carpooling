@@ -20,7 +20,7 @@
             <div class="col-lg-8 m-15px-tb">
                 <article class="article">
                     <div class="article-title">
-                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Travel from @Model.StartCity to @Model.DestinationCity</h5>
+                        <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Travel from @Model.StartPointCityName to @Model.EndPointCityName</h5>
                     </div>
                     <div class="article-content">
                         <p>The time of departure for this travel is on @Model.DepartureTime</p>
@@ -28,19 +28,19 @@
                     </div>
                     <label for="optional-comments">Preferences</label>
                     <div id="optional-comments" class="nav tag-cloud">
-                        @foreach (var tag in Model.Tags)
+                        @foreach (var tag in Model.TravelTags)
                         {   
                             <a href="#">@tag</a>
                         }
                     </div>
                 </article>
-                @if (Model.Applicants.Any(applicant => applicant.Username == ViewData["CurrentUser"].ToString()))
+                @if (Model.ApplyingPassengers.Any(applicant => applicant.Username == ViewData["CurrentUser"].ToString()))
                 {
                     <div class="contact-form article-comment">
                         <a asp-action="Leave" asp-route-Id="@Model.Id">Cancel appliance</a>
                     </div>
                 }
-                else if (Model.Participants.Any(participant => participant.Username == ViewData["CurrentUser"].ToString()))
+                else if (Model.Passengers.Any(participant => participant.Username == ViewData["CurrentUser"].ToString()))
                 {
                     <div class="contact-form article-comment">
                         <a asp-action="Leave" asp-route-Id="@Model.Id">Cancel participation</a>
@@ -52,8 +52,8 @@
                         <a asp-action="Complete" asp-route-Id="@Model.Id">Mark travel as completed</a>
                     </div>
                 }
-                else if (Model.Applicants.All(applicant => applicant.Username != ViewData["CurrentUser"].ToString()) &&
-                         Model.Participants.All(participant => participant.Username != ViewData["CurrentUser"].ToString()) &&
+                else if (Model.ApplyingPassengers.All(applicant => applicant.Username != ViewData["CurrentUser"].ToString()) &&
+                         Model.Passengers.All(participant => participant.Username != ViewData["CurrentUser"].ToString()) &&
                          Model.Driver.Username != ViewData["CurrentUser"].ToString())
                 {
                     <div class="contact-form article-comment">
@@ -69,7 +69,7 @@
                     <div class="widget-body">
                         <div class="media align-items-center">
                             <div class="avatar">
-                                <img src="~/images/@Model.Driver.ProfilePicture" title="" alt="">
+                                <img src="~/images/@Model.Driver.ProfilePictureName" title="" alt="">
                             </div>
                             <div class="media-body">
                                 <h6>@Model.Driver.FirstName @Model.Driver.LastName</h6>
@@ -95,7 +95,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var participant in Model.Participants)
+                                    @foreach (var participant in Model.Passengers)
                                     {
                                         <tr>
                                             <td>@participant.FirstName @participant.LastName</td>
@@ -134,7 +134,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var applicant in Model.Applicants)
+                                @foreach (var applicant in Model.Passengers)
                                 {
                                 <tr>
                                     <td>@applicant.FirstName @applicant.LastName</td>

@@ -13,12 +13,12 @@ namespace Carpooling.Web.Helpers
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            string roles = context.HttpContext.Session.GetString("CurrentRoles");
+            string RolesName = context.HttpContext.Session.GetString("CurrentRoles");
 
-            if (roles != null)
+            if (RolesName != null)
             {
-                var roleList = roles.Split(',');
-                if (!roleList.Contains(this.Role))
+                var roleList = RolesName.Split(',');
+                if (roleList.Length < 1)
                 {
                     context.Result = new UnauthorizedResult();
                 }

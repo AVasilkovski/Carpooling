@@ -6,16 +6,16 @@
             <label for="Filter">Filter by:</label>
             <div id="Filter" class="form-row">
                 <div class="col">
-                    <input type="text" class="form-control" name="driver" value="@ViewData["Driver"]" placeholder="Driver username" />
+                    <input type="text" class="form-control" name="driver" value="@ViewData["DriverUsername"]" placeholder="Driver username" />
                 </div>
                 <div class="col">
-                    <input type="text" class="form-control" name="startCity" value="@ViewData["StartCity"]" placeholder="Start point" />
+                    <input type="text" class="form-control" name="startCity" value="@ViewData["StartPointCityName"]" placeholder="Start point" />
                 </div>
                 <div class="col">
-                    <input type="text" class="form-control" name="destinationCity" value="@ViewData["DestinationCity"]" placeholder="Destination point" />
+                    <input type="text" class="form-control" name="destinationCity" value="@ViewData["EndPointCityName"]" placeholder="Destination point" />
                 </div>
                 <div class="col">
-                    <input type="number" class="form-control" name="spots" value="@ViewData["Spots"]" placeholder="Passenger spots" />
+                    <input type="number" class="form-control" name="spots" value="@ViewData["FreeSpots"]" placeholder="Passenger spots" />
                 </div>
             </div>
             <label for="Sort">Sort by:</label>
@@ -51,8 +51,8 @@
                 {
                     <tr>
                         <td>@travel.DriverUsername</td>
-                        <td>@travel.StartCity</td>
-                        <td>@travel.DestinationCity</td>
+                        <td>@travel.StartPointCityName</td>
+                        <td>@travel.EndPointCityName</td>
                         <td>@travel.FreeSpots</td>
                         <td>@travel.DepartureTime</td>
                         <td>

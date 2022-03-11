@@ -2,6 +2,6 @@
 {
     public class CityCreateDTO
     {
-        public string City { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Carpooling.Web.Models
 {
@@ -20,5 +21,6 @@ namespace Carpooling.Web.Models
 
         [Display(Name = "Rating as passenger")]
         public double RatingAsPassenger { get; set; }
+
     }
 }

@@ -2,7 +2,7 @@
     this.ViewData["IsAuthenticated"] = this.Context.Session.Keys.Contains("CurrentUser");
     this.ViewData["CurrentUser"] = this.Context.Session.GetString("CurrentUser");
     this.ViewData["CurrentRoles"] = this.Context.Session.GetString("CurrentRoles");
-    this.ViewData["ProfilePicture"] = this.Context.Session.GetString("ProfilePicture");
+    this.ViewData["ProfilePictureName"] = this.Context.Session.GetString("ProfilePictureName");
     this.ViewData["UserId"] = this.Context.Session.GetString("UserId");
 }
 
@@ -57,7 +57,7 @@
                     </div>
                 </div>
                 <a class="nav-link my-2 my-sm-0" asp-controller="Users" asp-action="MyProfile" asp-route-id="@ViewData["UserId"]">
-                    <img class="rounded-circle" src="~/images/@ViewData["ProfilePicture"]" alt="Profile picture" height="40" width="50" />
+                    <img class="rounded-circle" src="~/images/@ViewData["ProfilePictureName"]" alt="Profile picture" height="40" width="50" />
                 </a>
             </div>
         }

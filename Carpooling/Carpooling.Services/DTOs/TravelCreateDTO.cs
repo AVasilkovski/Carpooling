@@ -7,9 +7,9 @@ namespace Carpooling.Services.DTOs
     {
         public int DriverId { get; set; }
 
-        public CityCreateDTO StartPointAddress { get; set; }
+        public string StartPointCityName { get; set; }
 
-        public CityCreateDTO EndPointAddress { get; set; }
+        public string EndPointCityName { get; set; }
 
         public DateTime DepartureTime { get; set; }
 

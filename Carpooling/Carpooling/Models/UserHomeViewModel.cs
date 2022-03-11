@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Carpooling.Web.Models
 {
@@ -11,6 +12,10 @@ namespace Carpooling.Web.Models
         public string LastName { get; set; }
 
         [Display(Name = "Profile picture")]
-        public string ProfilePicture { get; set; }
+        public string ProfilePictureName { get; set; }
+
+        public IEnumerable<string> RolesName { get; set; }
+
+
     }
 }

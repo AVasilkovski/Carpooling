@@ -72,15 +72,15 @@ namespace Carpooling.Data.Migrations
                 name: "RoleUser",
                 columns: table => new
                 {
-                    RolesId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
                     UsersId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RoleUser", x => new { x.RolesId, x.UsersId });
+                    table.PrimaryKey("PK_RoleUser", x => new { x.RoleId, x.UsersId });
                     table.ForeignKey(
-                        name: "FK_RoleUser_Roles_RolesId",
-                        column: x => x.RolesId,
+                        name: "FK_RoleUser_Roles_RoleId",
+                        column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -294,7 +294,7 @@ namespace Carpooling.Data.Migrations
 
             migrationBuilder.InsertData(
                 table: "RoleUser",
-                columns: new[] { "RolesId", "UsersId" },
+                columns: new[] { "RoleId", "UsersId" },
                 values: new object[,]
                 {
                     { 1, 14 },

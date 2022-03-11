@@ -7,6 +7,8 @@ using Carpooling.Services.DTOs;
 using Carpooling.Services.Services.Contracts;
 using Carpooling.Services.Exceptions;
 using System.Threading.Tasks;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace Carpooling.Services.Services
 {
@@ -14,11 +16,13 @@ namespace Carpooling.Services.Services
     {
         private readonly CarpoolingContext dbContext;
         private readonly IUserService userService;
+        private readonly IMapper mapper;
 
-        public FeedbackService(CarpoolingContext dbContext, IUserService userService)
+        public FeedbackService(CarpoolingContext dbContext, IUserService userService, IMapper mapper)
         {
             this.dbContext = dbContext;
             this.userService = userService;
+            this.mapper = mapper;
         }
 
         private IQueryable<Feedback> FeedbacksQuery
@@ -26,42 +30,42 @@ namespace Carpooling.Services.Services
             get
             {
                 return this.dbContext.Feedbacks.Include(user => user.UserFrom)
-                                                    .ThenInclude(role => role.Roles)
+                                                    .ThenInclude(role => role.Role)
                                                .Include(user => user.UserTo)
-                                                    .ThenInclude(role => role.Roles);
+                                                    .ThenInclude(role => role.Role);
             }
         }
 
         public IQueryable<FeedbackPresentDTO> GetAll()
         {
-            return this.FeedbacksQuery.Select(feedback => feedback.ToFeedbackDTO());
+            return this.FeedbacksQuery.ProjectTo<FeedbackPresentDTO>(mapper.ConfigurationProvider); //Select(feedback => mapper.Map<FeedbackPresentDTO>(feedback));
         }
 
-        public FeedbackPresentDTO Get(int id)
+        public async Task<FeedbackPresentDTO> GetAsync(int id)
         {
-            var feedback = this.GetFeedback(id);
+            var feedback = await this.GetFeedbackAsync(id);
 
-            return feedback.ToFeedbackDTO();
+            return mapper.Map<FeedbackPresentDTO>(feedback);
         }
 
         public async Task<FeedbackPresentDTO> CreateAsync(FeedbackCreateDTO feedbackCreateDTO)
         {
             await this.userService.UpdateUserRatingAsync(feedbackCreateDTO.UserToId, feedbackCreateDTO.Type);
-            var feedback = feedbackCreateDTO.ToFeedback();
+            var feedback = mapper.Map<Feedback>(feedbackCreateDTO);
             await this.dbContext.Feedbacks.AddAsync(feedback);
             await this.dbContext.SaveChangesAsync();
-            feedback = this.GetFeedback(feedback.Id);
+            feedback = await this.GetFeedbackAsync(feedback.Id);
 
-            return feedback.ToFeedbackDTO();
+            return mapper.Map<FeedbackPresentDTO>(feedback);
         }
 
         public async Task<FeedbackPresentDTO> DeleteAsync(int id)
         {
-            var feedback = this.GetFeedback(id);
+            var feedback = await this .GetFeedbackAsync(id);
             this.dbContext.Feedbacks.Remove(feedback);
             await this.dbContext.SaveChangesAsync();
 
-            return feedback.ToFeedbackDTO();
+            return mapper.Map<FeedbackPresentDTO>(feedback);
         }
 
         public IEnumerable<FeedbackPresentDTO> SearchUserGivenFeedbacks(int userId, string username, double? rating, bool ratingSort)
@@ -97,14 +101,14 @@ namespace Carpooling.Services.Services
                 feedbacks = feedbacks.OrderByDescending(feedback => feedback.Rating);
             }
 
-            var result = feedbacks.Select(feedback => feedback.ToFeedbackDTO());
+            var result = feedbacks.Select(feedback => mapper.Map<FeedbackPresentDTO>(feedback));
 
             return result;
         }
 
-        private Feedback GetFeedback(int id)
+        private async Task<Feedback> GetFeedbackAsync(int id)
         {
-            var feedback = this.FeedbacksQuery.FirstOrDefault(feedback => feedback.Id == id);
+            var feedback = await this.FeedbacksQuery.FirstOrDefaultAsync(feedback => feedback.Id == id);
 
             if (feedback == null)
             {

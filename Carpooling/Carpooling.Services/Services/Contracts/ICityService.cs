@@ -7,6 +7,6 @@ namespace Carpooling.Services.Services.Contracts
     {
         Task<City> CreateCityAsync(string city);
 
-        Task<City> CheckIfCityExistAsync(string city);
+        Task<string> CheckIfCityExistAsync(string city);
     }
 }

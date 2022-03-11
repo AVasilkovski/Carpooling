@@ -15,16 +15,17 @@ namespace Carpooling.Services.Services
             this.dbContex = dbContex;
         }
 
-        public async Task<City> CheckIfCityExistAsync(string cityName)
+        public async Task<string> CheckIfCityExistAsync(string cityName)
         {
             var result = this.dbContex.Cities.FirstOrDefault(city => city.Name == cityName);
             if (result == null)
             {
-                return await this.CreateCityAsync(cityName);
+                await this.CreateCityAsync(cityName);
+                return cityName;
             }
             else
             {
-                return result;
+                return result.Name;
             }
         }
 

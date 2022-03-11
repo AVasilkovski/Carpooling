@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Carpooling.Data;
 using Carpooling.Data.Models;
 using Carpooling.Data.Models.Enums;
@@ -14,17 +15,19 @@ namespace Carpooling.Services.Services
     public class UserService : IUserService
     {
         private readonly CarpoolingContext dbContext;
+        private readonly IMapper mapper;
 
-        public UserService(CarpoolingContext dbContext)
+        public UserService(CarpoolingContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
+            this.mapper = mapper;
         }
 
         private IQueryable<User> UsersQuerry
         {
             get
             {
-                return this.dbContext.Users.Include(role => role.Roles)
+                return this.dbContext.Users.Include(role => role.Role)
                                            .Include(feedback => feedback.RecievedFeedbacks);
             }
         }
@@ -32,47 +35,53 @@ namespace Carpooling.Services.Services
         public async Task<UserPresentDTO> CreateAsync(UserCreateDTO userDTO)
         {
             this.IsUserUnique(userDTO.Username, userDTO.Email, userDTO.PhoneNumber);
-            var user = userDTO.ToUser();
-            var role = this.dbContext.Roles.FirstOrDefault(role => role.Name == "User");
+            var user = mapper.Map<User>(userDTO);
+            var role = await this.dbContext.Roles.FirstOrDefaultAsync(role => role.Name == "User");
             user.UserStatus = UserStatus.Active;
             user.ProfilePictureName = "defaultProfilePicture.png";
-            user.Roles.Add(role);
+            user.Role.Add(role);
             await this.dbContext.Users.AddAsync(user);  
             await this.dbContext.SaveChangesAsync();
 
-            return user.ToUserDTO();
+            return this.mapper.Map<UserPresentDTO>(user);
         }
 
         public async Task<UserPresentDTO> DeleteAsync(int id)
         {
-            var tobeDeleted = this.GetUser(id);
+            var tobeDeleted = await this.GetUserAsync(id);
             this.dbContext.Users.Remove(tobeDeleted);
             await this.dbContext.SaveChangesAsync();
 
-            return tobeDeleted.ToUserDTO();
+            return this.mapper.Map<UserPresentDTO>(tobeDeleted);
         }
 
+        public async Task<UserPresentDTO> GetAsync(int id)
+        {
+            var user = await this.GetUserAsync(id);
+
+            return this.mapper.Map<UserPresentDTO>(user);
+        }
         public UserPresentDTO Get(int id)
         {
-            var user = this.GetUser(id);
+            var user =  this.GetUserAsync(id);
 
-            return user.ToUserDTO();
+            return this.mapper.Map<UserPresentDTO>(user);
         }
 
         public IEnumerable<UserPresentDTO> GetAll()
         {
             var result = this.GetAllUsers();
 
-            return result.Select(user => user.ToUserDTO());
+            return result.Select(user => mapper.Map<UserPresentDTO>(user));
         }
 
         public async Task<UserPresentDTO> UpdateAsync(int id, UserCreateDTO updateUser)
         {
-            var user = this.GetUser(id);
+            var user = await this.GetUserAsync(id);
 
-            if (!string.IsNullOrEmpty(updateUser.ProfilePicture))
+            if (!string.IsNullOrEmpty(updateUser.ProfilePictureName))
             {
-                user.ProfilePictureName = updateUser.ProfilePicture;
+                user.ProfilePictureName = updateUser.ProfilePictureName;
             }
 
             if (!string.IsNullOrEmpty(updateUser.Password))
@@ -103,19 +112,19 @@ namespace Carpooling.Services.Services
             this.dbContext.Users.Update(user);
             await this.dbContext.SaveChangesAsync();
 
-            return user.ToUserDTO();
+            return this.mapper.Map<UserPresentDTO>(user);
         }
 
-        public UserPresentDTO GetUserByCredentials(string username, string password)
+        public async Task<UserPresentDTO> GetUserByCredentialsAsync(string username, string password)
         {
-            var user = this.UsersQuerry.FirstOrDefault(user => user.Username == username && user.Password == password);
+            var user = await this.UsersQuerry.FirstOrDefaultAsync(user => user.Username == username && user.Password == password);
 
             if (user == null)
             {
                 throw new EntityNotFoundException();
             }
 
-            return user.ToUserDTO();
+            return this.mapper.Map<UserPresentDTO>(user);
         }
 
         public IEnumerable<UserPresentDTO> GetTop10Drivers()
@@ -123,7 +132,7 @@ namespace Carpooling.Services.Services
             return this.UsersQuerry.Where(user => user.RatingAsDriver > 0)
                                    .OrderByDescending(user => user.RatingAsDriver)
                                    .Take(10)
-                                   .Select(user => user.ToUserDTO());
+                                   .Select(user => mapper.Map<UserPresentDTO>(user));
         }
 
         public IEnumerable<UserPresentDTO> GetTop10Passengers()
@@ -131,17 +140,17 @@ namespace Carpooling.Services.Services
             return this.UsersQuerry.Where(user => user.RatingAsPassenger > 0)
                                    .OrderByDescending(user => user.RatingAsPassenger)
                                    .Take(10)
-                                   .Select(user => user.ToUserDTO());
+                                   .Select(user => mapper.Map<UserPresentDTO>(user));
         }
 
         public IEnumerable<UserPresentDTO> GetFilteredUsers(string phoneNumber, string username, string email)
         {
-            return this.FilterUsers(phoneNumber, username, email).Select(user => user.ToUserDTO());
+            return this.FilterUsers(phoneNumber, username, email).Select(user => mapper.Map<UserPresentDTO>(user));
         }
 
         public async Task BlockUserAsync(int id)
         {
-            var user = this.GetUser(id);
+            var user = await this.GetUserAsync(id);
             user.UserStatus = UserStatus.Blocked;
             this.dbContext.Users.Update(user);
             await this.dbContext.SaveChangesAsync();
@@ -149,7 +158,7 @@ namespace Carpooling.Services.Services
 
         public async Task UnblockUserAsync(int id)
         {
-            var user = this.GetUser(id);
+            var user = await this.GetUserAsync(id);
             user.UserStatus = UserStatus.Active;
             this.dbContext.Users.Update(user);
             await this.dbContext.SaveChangesAsync();
@@ -175,7 +184,7 @@ namespace Carpooling.Services.Services
 
         public async Task UpdateUserRatingAsync(int id, FeedbackType feedbackType)
         {
-            var user = this.GetUser(id);
+            var user = await this.GetUserAsync(id);
 
             if (feedbackType == FeedbackType.Driver)
             {
@@ -218,12 +227,12 @@ namespace Carpooling.Services.Services
 
         private IEnumerable<User> GetAllUsers()
         {
-            return this.UsersQuerry.Where(user => user.Roles.Any(role => role.Name != "Admin"));
+            return this.UsersQuerry.Where(user => user.Role.Any(role => role.Name != "Admin"));
         }
 
-        private User GetUser(int id)
+        private async Task<User> GetUserAsync(int id)
         {
-            var user = this.UsersQuerry.FirstOrDefault(user => user.Id == id);
+            var user = await this.UsersQuerry.FirstOrDefaultAsync(user => user.Id == id);
 
             if (user != null)
             {

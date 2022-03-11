@@ -1,4 +1,5 @@
-﻿using Carpooling.Services.Services.Contracts;
+﻿using AutoMapper;
+using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers;
 using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,13 @@ namespace Carpooling.Web.Controllers
     {
         private readonly IUserService userService;
         private readonly ITravelService travelService;
+        private readonly IMapper mapper;
 
-        public AdminController(IUserService userService, ITravelService travelService)
+        public AdminController(IUserService userService, ITravelService travelService, IMapper mapper)
         {
             this.userService = userService;
             this.travelService = travelService;
+            this.mapper = mapper;
         }
 
         public IActionResult Users(string username, string email, string phoneNumber)
@@ -25,7 +28,7 @@ namespace Carpooling.Web.Controllers
             ViewData["Email"] = email;
             ViewData["PhoneNumber"] = phoneNumber;
 
-            var users = this.userService.GetFilteredUsers(phoneNumber, username, email).Select(user => user.ToUserViewModel());
+            var users = this.userService.GetFilteredUsers(phoneNumber, username, email).Select(user => this.mapper.Map<UserViewModel>(user));
 
             return View(users);
         }
@@ -51,7 +54,7 @@ namespace Carpooling.Web.Controllers
             ViewData["Spots"] = spots;
 
             var allTravels = this.travelService.SearchAllTravels(startCity, destinationCity, driver, spots, dateSort, spotsSort);
-            var searchResult = allTravels.Select(travel => travel.ToTravelViewModel());
+            var searchResult = allTravels.Select(travel => this.mapper.Map<TravelViewModel>(travel));
             return View(searchResult);
         }
     }

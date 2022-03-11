@@ -6,9 +6,9 @@ namespace Carpooling.Web.Models.APIModel
     {
         public int DriverId { get; set; }
 
-        public CityResponseModel StartPointAddress { get; set; }
+        public string StartPointCityName { get; set; }
 
-        public CityResponseModel EndPointAddress { get; set; }
+        public string EndPointCityName { get; set; }
 
         public DateTime DepartureTime { get; set; }
 

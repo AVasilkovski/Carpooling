@@ -1,4 +1,6 @@
-﻿using Carpooling.Services.Services.Contracts;
+﻿using AutoMapper;
+using Carpooling.Services.DTOs;
+using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers.Contracts;
 using Carpooling.Web.Models.APIModel;
 using Microsoft.AspNetCore.Mvc;
@@ -14,23 +16,25 @@ namespace Carpooling.Web.Controllers.APIController
     {
         private readonly IUserService userService;
         private readonly IAuthHelper authHelper;
+        private readonly IMapper mapper;
 
-        public UsersController(IUserService userService, IAuthHelper authHelper)
+        public UsersController(IUserService userService, IAuthHelper authHelper, IMapper mapper)
         {
             this.userService = userService;
             this.authHelper = authHelper;
+            this.mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get([FromHeader] string userName, [FromHeader] string password, int id)
+        public async Task<IActionResult> Get([FromHeader] string userName, [FromHeader] string password, int id)
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "User" && user.Id == id))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("User") && user.Id == id))
                 {
-                    var logedUser = this.userService.Get(id);
-                    var result = logedUser.UserResponseModel();
+                    var logedUser = await this.userService.GetAsync(id);
+                    var result = this.mapper.Map<UserResponseModel>(logedUser);
                     return Ok(result);
                 }
                 return BadRequest();
@@ -42,14 +46,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpGet("")]
-        public ActionResult GetUsers([FromHeader] string credentials, [FromHeader] string password)
+        public async Task<ActionResult> GetUsers([FromHeader] string credentials, [FromHeader] string password)
         {
             try
             {
-                var employee = this.authHelper.TryGetUser(credentials, password);
-                if (employee.Roles.Any(role => role == "Admin"))
+                var employee = await this.authHelper.TryGetUserAsync(credentials, password);
+                if (employee.Role.Any(role => role.Equals("Admin")))
                 {
-                    var result = this.userService.GetAll().Select(user => user.UserResponseModel());
+                    var result = this.userService.GetAll().Select(user => this.mapper.Map<UserResponseModel>(user));
                     return this.Ok(result);
                 }
 
@@ -66,9 +70,9 @@ namespace Carpooling.Web.Controllers.APIController
         {
             try
             {
-                var user = userRequestModel.UserRequestModel();
+                var user = this.mapper.Map<UserCreateDTO>(userRequestModel);
                 var createdUser = await this.userService.CreateAsync(user);
-                var result = createdUser.UserResponseModel();
+                var result = this.mapper.Map<UserResponseModel>(createdUser);
                 return this.Created("New Customer", result);
             }
             catch (ArgumentNullException)
@@ -82,12 +86,12 @@ namespace Carpooling.Web.Controllers.APIController
         {
             try
             {
-                var user = this.authHelper.TryGetUser(credentials, password);
-                if (user.Roles.Any(role => role == "User" && user.Id == userId))
+                var user = await this.authHelper.TryGetUserAsync(credentials, password);
+                if (user.Role.Any(role => role.Equals("User") && user.Id == userId))
                 {
-                    var userToBeModified = userRequestModel.UserRequestModel();
+                    var userToBeModified = this.mapper.Map<UserCreateDTO>(userRequestModel);
                     var updatedUser = await this.userService.UpdateAsync(userId, userToBeModified);
-                    var result = updatedUser.UserResponseModel();
+                    var result = this.mapper.Map<UserResponseModel>(updatedUser);
                     return this.Ok(result);
                 }
 
@@ -104,8 +108,8 @@ namespace Carpooling.Web.Controllers.APIController
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "Admin" && user.Id == id))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("Admin") && user.Id == id))
                 {
                     await this.userService.DeleteAsync(id);
                     return this.NoContent();
@@ -123,8 +127,8 @@ namespace Carpooling.Web.Controllers.APIController
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Contains("Admin") && user.Id != userId && !this.userService.Get(userId).Roles.Contains("Admin"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Contains("Admin") && user.Id != userId && !this.userService.Get(userId).Role.Contains("Admin"))
                 {
                     await this.userService.BlockUserAsync(userId);
                     return this.Ok();
@@ -142,8 +146,8 @@ namespace Carpooling.Web.Controllers.APIController
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Contains("Admin") && user.Id != userId && !this.userService.Get(userId).Roles.Contains("Admin"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Contains("Admin") && user.Id != userId && !this.userService.Get(userId).Role.Contains("Admin"))
                 {
                     await this.userService.UnblockUserAsync(userId);
                     return this.Ok();
@@ -157,14 +161,14 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpGet("Search")]
-        public IActionResult SearchAsAdmin([FromHeader] string userName, [FromHeader] string password, string phoneNumber, string usersName, string email)
+        public async Task<IActionResult> SearchAsAdmin([FromHeader] string userName, [FromHeader] string password, string phoneNumber, string usersName, string email)
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "Admin"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("Admin")))
                 {
-                    var sortedUsers = this.userService.GetFilteredUsers(email, phoneNumber, usersName).Select(user => user.UserResponseModel());
+                    var sortedUsers = this.userService.GetFilteredUsers(email, phoneNumber, usersName).Select(user => this.mapper.Map<UserResponseModel>(user));
                     return this.Ok(sortedUsers);
                 }
                 return BadRequest();
