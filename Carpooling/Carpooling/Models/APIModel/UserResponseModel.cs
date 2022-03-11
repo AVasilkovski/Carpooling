@@ -1,4 +1,5 @@
-﻿using Carpooling.Services.DTOs;
+﻿using Carpooling.Data.Models.Enums;
+using Carpooling.Services.DTOs;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -6,20 +7,6 @@ namespace Carpooling.Web.Models.APIModel
 {
     public class UserResponseModel
     {
-        public UserResponseModel(UserPresentDTO userPresentDTO)
-        {
-            this.Id = userPresentDTO.Id;
-            this.Username = userPresentDTO.Username;
-            this.FirstName = userPresentDTO.FirstName;
-            this.LastName = userPresentDTO.LastName;
-            this.Email = userPresentDTO.Email;
-            this.PhoneNumber = userPresentDTO.PhoneNumber;
-            this.ProfilePic = userPresentDTO.ProfilePic;
-            this.Status = userPresentDTO.Status.ToString();
-            this.Roles = userPresentDTO.Roles;
-            this.RatingAsDriver = userPresentDTO.RatingAsDriver;
-            this.RatingAsPassenger = userPresentDTO.RatingAsPassenger;
-        }
         public int Id { get; set; }
 
         [StringLength(20, MinimumLength = 2, ErrorMessage = "Username must be between 2 and 20 characters")]
@@ -38,15 +25,15 @@ namespace Carpooling.Web.Models.APIModel
         [Phone(ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; }
 
-        public string ProfilePic { get; set; }
+        public string ProfilePictureName { get; set; }
 
         public double RatingAsDriver { get; set; }
 
         public double RatingAsPassenger { get; set; }
 
-        public string Status { get; set; }
+        public UserStatus UserStatus { get; set; }
 
-        public IEnumerable<string> Roles { get; set; }
+        public IEnumerable<string> RolesName { get; set; }
 
         [RegularExpression(@"^.*(?=.{8,})(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!*@#$%^&+=-]).*$",
         ErrorMessage = "Password must be at least 8 characters long and must contain at least one capital letter, one digit and one special symbol like ( !, *, @, #, $, %, ^, &, +, =, - )")]

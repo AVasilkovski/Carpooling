@@ -46,7 +46,7 @@
             @foreach (var driver in Model.Top10Drivers)
             {
                 <div class="item">
-                    <img src="~/images/@driver.ProfilePicture" width="100" height="100" alt="Alternate Text" />
+                    <img src="~/images/@driver.ProfilePictureName" width="100" height="100" alt="Alternate Text" />
 
                     <p>@driver.FirstName @driver.LastName</p>
                 </div>
@@ -59,7 +59,7 @@
             @foreach (var passenger in Model.Top10Passengers)
             {
                 <div class="item">
-                    <img src="~/images/@passenger.ProfilePicture" width="100" height="100" alt="Alternate Text" />
+                    <img src="~/images/@passenger.ProfilePictureName" width="100" height="100" alt="Alternate Text" />
                     <p>@passenger.FirstName @passenger.LastName</p>
                 </div>
             }

@@ -1,4 +1,6 @@
-﻿using Carpooling.Services.Services.Contracts;
+﻿using AutoMapper;
+using Carpooling.Services.DTOs;
+using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers.Contracts;
 using Carpooling.Web.Models.APIModel;
 using Microsoft.AspNetCore.Mvc;
@@ -14,23 +16,25 @@ namespace Carpooling.Web.Controllers.APIController
     {
         private readonly IFeedbackService feedbackService;
         private readonly IAuthHelper authHelper;
+        private readonly IMapper mapper;
 
-        public FeedbacksController(IFeedbackService feedbackService, IAuthHelper authHelper)
+        public FeedbacksController(IFeedbackService feedbackService, IAuthHelper authHelper, IMapper mapper)
         {
             this.feedbackService = feedbackService;
             this.authHelper = authHelper;
+            this.mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get([FromHeader] string userName, [FromHeader] string password, int id)
+        public async Task<IActionResult> Get([FromHeader] string userName, [FromHeader] string password, int id)
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "User"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("User")))
                 {
-                    var feedback = this.feedbackService.Get(id);
-                    var result = feedback.FeedbackResponseModel();
+                    var feedback = await this.feedbackService.GetAsync(id);
+                    var result = this.mapper.Map<FeedbackResponseModel>(feedback);
                     return Ok(result);
                 }
                 return BadRequest();
@@ -42,15 +46,15 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpGet("")]
-        public IActionResult Get([FromHeader] string userName, [FromHeader] string password)
+        public async Task<IActionResult> Get([FromHeader] string userName, [FromHeader] string password)
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "Admin"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("Admin")))
                 {
                     var feedbacks = this.feedbackService.GetAll();
-                    var result = feedbacks.Select(feedback => feedback.FeedbackResponseModel());
+                    var result = feedbacks.Select(feedback => this.mapper.Map<FeedbackResponseModel>(feedback));
                     return Ok(result);
                 }
                 return BadRequest();
@@ -66,8 +70,8 @@ namespace Carpooling.Web.Controllers.APIController
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "Admin"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("Admin")))
                 {
                     await this.feedbackService.DeleteAsync(id);
                     return this.NoContent();
@@ -81,15 +85,15 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpGet("Recieved/{userName}")]
-        public IActionResult SearchRecievedFeedbacks([FromHeader] string userName, [FromHeader] string password, int userId, string username, double? rating, bool ratingSort)
+        public async Task<IActionResult> SearchRecievedFeedbacks([FromHeader] string userName, [FromHeader] string password, int userId, string username, double? rating, bool ratingSort)
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "User"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("User")))
                 {
                     var filteredFeedbacks = this.feedbackService.SearchUserRecievedFeedbacks(userId, username, rating, ratingSort);
-                    var result = filteredFeedbacks.Select(feedback => feedback.FeedbackResponseModel());
+                    var result = filteredFeedbacks.Select(feedback => this.mapper.Map<FeedbackResponseModel>(feedback));
                     return this.Ok(result);
                 }
                 return BadRequest();
@@ -101,15 +105,15 @@ namespace Carpooling.Web.Controllers.APIController
         }
 
         [HttpGet("Given/{userName}")]
-        public IActionResult SearchGivenFeedbacks([FromHeader] string userName, [FromHeader] string password, int userId, string username, double? rating, bool ratingSort)
+        public async Task<IActionResult> SearchGivenFeedbacks([FromHeader] string userName, [FromHeader] string password, int userId, string username, double? rating, bool ratingSort)
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "User"))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("User")))
                 {
                     var filteredFeedbacks = this.feedbackService.SearchUserGivenFeedbacks(userId, username, rating, ratingSort);
-                    var result = filteredFeedbacks.Select(feedback => feedback.FeedbackResponseModel());
+                    var result = filteredFeedbacks.Select(feedback => this.mapper.Map<FeedbackResponseModel>(feedback));
                     return this.Ok(result);
                 }
                 return BadRequest();
@@ -125,12 +129,12 @@ namespace Carpooling.Web.Controllers.APIController
         {
             try
             {
-                var user = this.authHelper.TryGetUser(userName, password);
-                if (user.Roles.Any(role => role == "User" && user.Id == feedbackToBeCreated.UserFromId))
+                var user = await this.authHelper.TryGetUserAsync(userName, password);
+                if (user.Role.Any(role => role.Equals("User") && user.Id.Equals(feedbackToBeCreated.UserFromId)))
                 {
-                    var feedback = feedbackToBeCreated.FeedbackRequestModel();
+                    var feedback = this.mapper.Map<FeedbackCreateDTO>(feedbackToBeCreated);
                     var createdFeedback = await this.feedbackService.CreateAsync(feedback);
-                    var result = createdFeedback.FeedbackResponseModel();
+                    var result = this.mapper.Map<FeedbackResponseModel>(createdFeedback);
                     return this.Created("New Travel", result);
                 }
                 return this.BadRequest();

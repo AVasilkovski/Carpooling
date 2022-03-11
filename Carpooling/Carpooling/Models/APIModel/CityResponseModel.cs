@@ -2,11 +2,6 @@
 {
     public class CityResponseModel
     {
-        public CityResponseModel(string city)
-        {
-            City = city;
-        }
-
-        public string City { get; set; }
+        public string Name { get; set; }
     }
 }

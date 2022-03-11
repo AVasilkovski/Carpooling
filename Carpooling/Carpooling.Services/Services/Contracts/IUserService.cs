@@ -9,17 +9,15 @@ namespace Carpooling.Services.Services.Contracts
     {
         IEnumerable<UserPresentDTO> GetAll();
 
-        UserPresentDTO Get(int id);
+        Task<UserPresentDTO> GetAsync(int id);
 
         Task<UserPresentDTO> CreateAsync(UserCreateDTO user);
-
-        // UserCreateDTO Update(int id, UserCreateDTO updateUser);
 
         Task<UserPresentDTO> UpdateAsync(int id, UserCreateDTO updateUser);
 
         Task<UserPresentDTO> DeleteAsync(int id);
 
-        UserPresentDTO GetUserByCredentials(string username, string password);
+        Task<UserPresentDTO> GetUserByCredentialsAsync(string username, string password);
 
         IEnumerable<UserPresentDTO> GetTop10Drivers();
 
@@ -34,5 +32,7 @@ namespace Carpooling.Services.Services.Contracts
         void IsUserUnique(string username, string email, string phoneNumber);
 
         Task UpdateUserRatingAsync(int id, FeedbackType feedbackType);
+
+        public UserPresentDTO Get(int id);
     }
 }

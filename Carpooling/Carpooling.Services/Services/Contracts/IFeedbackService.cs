@@ -9,7 +9,7 @@ namespace Carpooling.Services.Services.Contracts
     {
         IQueryable<FeedbackPresentDTO> GetAll();
 
-        FeedbackPresentDTO Get(int id);
+        Task<FeedbackPresentDTO> GetAsync(int id);
 
         Task<FeedbackPresentDTO> CreateAsync(FeedbackCreateDTO feedbackCreateDTO);
 

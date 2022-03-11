@@ -8,6 +8,7 @@ using Carpooling.Services.DTOs;
 using Carpooling.Services.Services.Contracts;
 using Carpooling.Services.Exceptions;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace Carpooling.Services.Services
 {
@@ -15,13 +16,15 @@ namespace Carpooling.Services.Services
     {
         private readonly CarpoolingContext dbContext;
         private readonly ICityService cityService;
+        private readonly IMapper mapper;
         private readonly ITravelTagService travelTagService;
 
-        public TravelService(CarpoolingContext dbContext, ITravelTagService travelTagService, ICityService cityService)
+        public TravelService(CarpoolingContext dbContext, ITravelTagService travelTagService, ICityService cityService, IMapper mapper)
         {
             this.dbContext = dbContext;
             this.travelTagService = travelTagService;
             this.cityService = cityService;
+            this.mapper = mapper;
         }
 
         private IQueryable<Travel> TravelsQuery
@@ -31,11 +34,11 @@ namespace Carpooling.Services.Services
                 return this.dbContext.Travels.Include(start => start.StartPointCity)
                                                .Include(end => end.EndPointCity)
                                                .Include(driver => driver.Driver)
-                                                       .ThenInclude(role => role.Roles)
+                                                       .ThenInclude(role => role.Role)
                                                .Include(passenger => passenger.Passengers)
-                                                      .ThenInclude(role => role.Roles)
+                                                      .ThenInclude(role => role.Role)
                                                .Include(applying => applying.ApplyingPassengers)
-                                                      .ThenInclude(role => role.Roles)
+                                                      .ThenInclude(role => role.Role)
                                                .Include(feedback => feedback.Feedbacks)
                                                .Include(tag => tag.TravelTags);
             }
@@ -43,34 +46,34 @@ namespace Carpooling.Services.Services
 
         public IEnumerable<TravelPresentDTO> GetAll()
         {
-            return this.TravelsQuery.Select(travel => travel.ToTravelDTO());
+            return this.TravelsQuery.Select(travel => mapper.Map<TravelPresentDTO>(travel));
         }
 
-        public TravelPresentDTO Get(int id)
+        public async Task<TravelPresentDTO> GetAsync(int id)
         {
-            var result = this.GetTravel(id).ToTravelDTO();
+            var result = await this.GetTravelAsync(id);
 
-            return result;
+            return this.mapper.Map<TravelPresentDTO>(result);
         }
 
         public async Task<TravelPresentDTO> CreateAsync(TravelCreateDTO newTravel)
         {
-            var startCity = this.cityService.CheckIfCityExistAsync(newTravel.StartPointAddress.City);
-            var destinationCity = this.cityService.CheckIfCityExistAsync(newTravel.EndPointAddress.City);
-            var travel = newTravel.ToTravel();
-            travel.StartPointCity = await startCity;
-            travel.EndPointCity = await destinationCity;
-            travel.TravelTags = this.travelTagService.FindTags(newTravel.TravelTags);
-            await this.dbContext.Travels.AddAsync(travel);
+            var startCity = await this.cityService.CheckIfCityExistAsync(newTravel.StartPointCityName);
+            var destinationCity = await this.cityService.CheckIfCityExistAsync(newTravel.EndPointCityName);
+            var travel = this.mapper.Map<TravelPresentDTO>(newTravel);
+            travel.StartPointCityName = startCity;
+            travel.EndPointCityName = destinationCity;
+            travel.TravelTags = (IEnumerable<string>)this.travelTagService.FindTags(newTravel.TravelTags);
+            await this.dbContext.Travels.AddAsync(this.mapper.Map<Travel>(travel));
             await this.dbContext.SaveChangesAsync();
-            travel = this.GetTravel(travel.Id);
+            var createdTravel = await this.GetTravelAsync(travel.Id);
 
-            return travel.ToTravelDTO();
+            return this.mapper.Map<TravelPresentDTO>(createdTravel);
         }
 
         public async Task<TravelPresentDTO> UpdateAsync(int id, TravelCreateDTO travel)
         {
-            var travelToUpdate = this.GetTravel(id);
+            var travelToUpdate = await this.GetTravelAsync(id);
 
             if (travel.DepartureTime != default(DateTime))
             {
@@ -85,12 +88,12 @@ namespace Carpooling.Services.Services
             this.dbContext.Update(travelToUpdate);
             await this.dbContext.SaveChangesAsync();
 
-            return travelToUpdate.ToTravelDTO();
+            return this.mapper.Map<TravelPresentDTO>(travelToUpdate);
         }
 
         public async Task DeleteAsync(int id)
         {
-            var travel = GetTravel(id);
+            var travel = await GetTravelAsync(id);
             this.dbContext.Remove(travel);
             await this.dbContext.SaveChangesAsync();
         }
@@ -100,7 +103,7 @@ namespace Carpooling.Services.Services
             var travels = this.TravelsQuery;
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => travel.ToTravelDTO());
+            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
         }
 
         public IEnumerable<TravelPresentDTO> SearchAvailableTravels(string user, string destinationCity, string startCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -108,7 +111,7 @@ namespace Carpooling.Services.Services
             var travels = this.TravelsQuery.Where(travel => travel.Driver.Username != user && travel.IsCompleted == false);
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => travel.ToTravelDTO());
+            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
         }
 
         public IEnumerable<TravelPresentDTO> SearchFinishedUserTravels(string user, string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -119,7 +122,7 @@ namespace Carpooling.Services.Services
             var travels = travelsAsPassenger.Union(travelsAsDriver);
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => travel.ToTravelDTO());
+            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
         }
 
         public IEnumerable<TravelPresentDTO> SearchUserAsDriverTravels(string user, string startCity, string destinationCity, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -127,7 +130,7 @@ namespace Carpooling.Services.Services
             var travels = this.TravelsQuery.Where(travel => travel.Driver.Username == user && travel.IsCompleted == false);
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => travel.ToTravelDTO());
+            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
         }
 
         public IEnumerable<TravelPresentDTO> SearchAppliedUserTravels(string user, string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -135,7 +138,7 @@ namespace Carpooling.Services.Services
             var travels = this.TravelsQuery.Where(travel => travel.ApplyingPassengers.Any(passenger => passenger.Username == user));
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => travel.ToTravelDTO());
+            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
         }
 
         public IEnumerable<TravelPresentDTO> SearchApprovedUserTravels(string user, string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -143,7 +146,7 @@ namespace Carpooling.Services.Services
             var travels = this.TravelsQuery.Where(travel => travel.Passengers.Any(passenger => passenger.Username == user));
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => travel.ToTravelDTO());
+            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
         }
 
         private IQueryable<Travel> SearchTravels(IQueryable<Travel> travels, string startCity, string destinationCity, string driver, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
@@ -190,7 +193,7 @@ namespace Carpooling.Services.Services
 
         public async Task ApplyAsPassengerAsync(int userId, int travelId)
         {
-            var travel = this.GetTravel(travelId);
+            var travel = await this.GetTravelAsync(travelId);
 
             if (travel.DriverId == userId)
             {
@@ -219,7 +222,7 @@ namespace Carpooling.Services.Services
 
         public async Task AddPassengerAsync(int userId, int driverId, int travelId)
         {
-            var travel = this.GetTravel(travelId);
+            var travel = await this.GetTravelAsync(travelId);
 
             this.IsTravelCompleted(travel);
             if (travel.FreeSpots <= 0)
@@ -227,7 +230,7 @@ namespace Carpooling.Services.Services
                 throw new TravelException($"No free spots in travel with ID {travel.Id}");
             }
 
-            this.IsDriverAssigned(travelId, driverId);
+            await this.IsDriverAssignedAsync(travelId, driverId);
             var passenger = this.dbContext.Users.FirstOrDefault(user => user.Id == userId);
             if (passenger != null)
             {
@@ -252,7 +255,7 @@ namespace Carpooling.Services.Services
 
         public async Task MarkAsCompleteAsync(int travelId)
         {
-            var travel = this.GetTravel(travelId);
+            var travel = await this.GetTravelAsync(travelId);
             this.IsTravelCompleted(travel);
             travel.IsCompleted = true;
             this.dbContext.Travels.Update(travel);
@@ -261,7 +264,7 @@ namespace Carpooling.Services.Services
 
         public async Task CancelTripAsync(int travelId)
         {
-            var travel = this.GetTravel(travelId);
+            var travel = await this.GetTravelAsync(travelId);
             this.IsTravelCompleted(travel);
             this.dbContext.Travels.Remove(travel);
             await this.dbContext.SaveChangesAsync();
@@ -269,7 +272,7 @@ namespace Carpooling.Services.Services
 
         public async Task RejectPassengerAsync(int userId, int driverId, int travelId)
         {
-            this.IsDriverAssigned(travelId, driverId);
+            await this.IsDriverAssignedAsync(travelId, driverId);
             await this.RemovePassengerAsync(userId, travelId);
         }
 
@@ -280,7 +283,7 @@ namespace Carpooling.Services.Services
 
         private async Task RemovePassengerAsync(int userId, int travelId)
         {
-            var travel = this.GetTravel(travelId);
+            var travel = await this.GetTravelAsync(travelId);
             this.IsTravelCompleted(travel);
 
             var applyingPassenger = travel.ApplyingPassengers.FirstOrDefault(applicant => applicant.Id == userId);
@@ -305,9 +308,9 @@ namespace Carpooling.Services.Services
             throw new EntityNotFoundException($"User not found.");
         }
 
-        private bool IsDriverAssigned(int travelId, int userId)
+        private async Task<bool> IsDriverAssignedAsync(int travelId, int userId)
         {
-            var travel = this.GetTravel(travelId);
+            var travel = await this.GetTravelAsync(travelId);
             var driverId = travel.DriverId;
 
             if (userId == driverId)
@@ -328,9 +331,9 @@ namespace Carpooling.Services.Services
             }
         }
 
-        private Travel GetTravel(int id)
+        private async Task<Travel> GetTravelAsync(int id)
         {
-            var travel = this.TravelsQuery.FirstOrDefault(x => x.Id.Equals(id));
+            var travel = await this.TravelsQuery.FirstOrDefaultAsync(x => x.Id.Equals(id));
 
             if (travel != null)
             {

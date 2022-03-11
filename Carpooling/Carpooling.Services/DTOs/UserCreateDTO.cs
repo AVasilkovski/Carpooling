@@ -30,6 +30,6 @@ namespace Carpooling.Services.DTOs
         [Phone(ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; }
 
-        public string ProfilePicture { get; set; }
+        public string ProfilePictureName { get; set; }
     }
 }

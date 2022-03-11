@@ -1,4 +1,6 @@
-﻿using Carpooling.Services.Services.Contracts;
+﻿using AutoMapper;
+using Carpooling.Services.DTOs;
+using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers;
 using Carpooling.Web.Helpers.Contracts;
 using Carpooling.Web.Models;
@@ -14,11 +16,13 @@ namespace Carpooling.Web.Controllers
     {
         private readonly ITravelService travelService;
         private readonly ITravelTagHelper travelTagHelper;
+        private readonly IMapper mapper;
 
-        public TravelsController(ITravelService travelService, ITravelTagHelper travelTagHelper)
+        public TravelsController(ITravelService travelService, ITravelTagHelper travelTagHelper, IMapper mapper)
         {
             this.travelService = travelService;
             this.travelTagHelper = travelTagHelper;
+            this.mapper = mapper;
         }
 
         public IActionResult Index(string startCity, string destinationCity, string driver, int? spots, bool dateSort = false, bool spotsSort = false)
@@ -30,7 +34,7 @@ namespace Carpooling.Web.Controllers
 
             var user = this.HttpContext.Session.GetString("CurrentUser");
             var travels = this.travelService.SearchAvailableTravels(user, startCity, destinationCity, driver, spots, dateSort, spotsSort);
-            var searchResult = travels.Select(travel => travel.ToTravelViewModel());
+            var searchResult = travels.Select(travel => this.mapper.Map<TravelViewModel>(travel));
             return View(searchResult);
         }
 
@@ -49,7 +53,7 @@ namespace Carpooling.Web.Controllers
                 travelCreateViewModel.Tags = this.travelTagHelper.ListTags();
                 return this.View(travelCreateViewModel);
             }
-            if (travelCreateViewModel.SlectedTags == null)
+            if (travelCreateViewModel.Tags == null)
             {
                 this.ModelState.AddModelError("TagError", "Please select a tag");
                 travelCreateViewModel.Tags = this.travelTagHelper.ListTags();
@@ -57,7 +61,8 @@ namespace Carpooling.Web.Controllers
             }
 
             var driverId = int.Parse(this.HttpContext.Session.GetString("UserId"));
-            var travel = travelCreateViewModel.ToTravelCreateDTO(driverId);
+            travelCreateViewModel.DriverID = driverId;
+            var travel = this.mapper.Map<TravelCreateDTO>(travelCreateViewModel);
             await this.travelService.CreateAsync(travel);
             return RedirectToAction("Index", "MyTravels");
         }
@@ -76,15 +81,16 @@ namespace Carpooling.Web.Controllers
                 return this.View(travelUpdateViewModel);
             }
 
-            var travel = travelUpdateViewModel.ToTravelUpdate();
+            var travel = this.mapper.Map<TravelCreateDTO>(travelUpdateViewModel); 
             await this.travelService.UpdateAsync(id, travel);
             return RedirectToAction("Index", "MyTravels");
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var travel = this.travelService.Get(id);
-            var travelDetails = travel.ToTravelDetailsViewModel();
+            var travel = await this.travelService.GetAsync(id);
+
+            var travelDetails = this.mapper.Map<TravelDetailsViewModel>(travel);
             return View(travelDetails);
         }
 

@@ -1,4 +1,7 @@
-﻿namespace Carpooling.Web.Models
+﻿using Carpooling.Data.Models.Enums;
+using System.Collections.Generic;
+
+namespace Carpooling.Web.Models
 {
     public class UserViewModel
     {
@@ -10,6 +13,8 @@
 
         public string PhoneNumber { get; set; }
 
-        public string Status { get; set; }
+        public UserStatus UserStatus { get; set; }
+
+        public IEnumerable<string> RolesName { get; set; }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Carpooling.Services.Services.Contracts;
+﻿using AutoMapper;
+using Carpooling.Services.DTOs;
+using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers;
 using Carpooling.Web.Helpers.Contracts;
 using Carpooling.Web.Models;
@@ -14,23 +16,27 @@ namespace Carpooling.Web.Controllers
     {
         private readonly IUserService userService;
         private readonly IImageHelper imageHelper;
+        private readonly IMapper mapper;
 
-        public UsersController(IUserService userService, IImageHelper imageHelper)
+        public UsersController(IUserService userService, IImageHelper imageHelper, IMapper mapper)
         {
             this.userService = userService;
             this.imageHelper = imageHelper;
+            this.mapper = mapper;
         }
 
-        public IActionResult MyProfile(int id)
+        public async Task<IActionResult> MyProfile(int id)
         {
-            var user = this.userService.Get(id).ToUserProfileViewModel();
-            return View(user);
+            var user = await this.userService.GetAsync(id);
+            var result=this.mapper.Map<UserProfileViewModel>(user);
+            return View(result);
         }
 
-        public IActionResult Update(int id)
+        public async Task<IActionResult> Update(int id)
         {
-            var user = this.userService.Get(id).ToUserUpdateViewModel();
-            return View(user);
+            var user = await this.userService.GetAsync(id);
+            var result = this.mapper.Map<UserUpdateViewModel>(user);
+            return View(result);
         }
 
         [HttpPost]
@@ -50,13 +56,13 @@ namespace Carpooling.Web.Controllers
             }
 
             string profilePicture = string.Empty;
-            if (userUpdateViewModel.ProfilePicture != null)
+            if (userUpdateViewModel.IProfilePictureName != null)
             {
-                profilePicture = this.imageHelper.UploadImage(userUpdateViewModel.ProfilePicture);
-                this.HttpContext.Session.SetString("ProfilePicture", profilePicture);
+                profilePicture = await this.imageHelper.UploadImageAsync(userUpdateViewModel.IProfilePictureName);
+                this.HttpContext.Session.SetString("ProfilePictureName", profilePicture);
             }
-
-            var user = userUpdateViewModel.ToUserUpdate(profilePicture);
+            userUpdateViewModel.ProfilePictureName = profilePicture;
+            var user = this.mapper.Map<UserCreateDTO>(userUpdateViewModel);
             var userId = int.Parse(this.HttpContext.Session.GetString("UserId"));
             await this.userService.UpdateAsync(userId, user);
             return this.RedirectToAction("MyProfile", "Users", new { id = userId });

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Carpooling.Web.Models
@@ -6,7 +7,9 @@ namespace Carpooling.Web.Models
     public class UserUpdateViewModel
     {
         [Display(Name = "Profile picture")]
-        public IFormFile ProfilePicture { get; set; }
+        public IFormFile IProfilePictureName { get; set; }
+
+        public string ProfilePictureName { get; set; }
 
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -27,5 +30,7 @@ namespace Carpooling.Web.Models
         [StringLength(10, MinimumLength = 10, ErrorMessage = "Phone number must be 10 digits")]
         [Phone(ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; }
+
+        public IEnumerable<string> RolesName { get; set; }
     }
 }

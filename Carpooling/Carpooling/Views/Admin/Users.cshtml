@@ -41,9 +41,9 @@
                     <td>@user.Username</td>
                     <td>@user.Email</td>
                     <td>@user.PhoneNumber</td>
-                    <td>@user.Status</td>
+                    <td>@user.UserStatus</td>
                     <td>
-                        @if (user.Status == "Blocked")
+                        @if (user.UserStatus.ToString() == "Blocked")
                         {
 
                             <a class="btn btn-info" asp-action="Unblock" asp-route-id="@user.Id">Unblock</a>

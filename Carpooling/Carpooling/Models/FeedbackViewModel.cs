@@ -2,6 +2,6 @@
 {
     public class FeedbackViewModel
     {
-        public string Username { get; set; }
+        public string UserFromUsername { get; set; }
     }
 }

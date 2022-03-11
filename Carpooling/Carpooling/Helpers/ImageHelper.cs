@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Helpers
 {
@@ -15,7 +16,7 @@ namespace Carpooling.Web.Helpers
             this.webHostEnvironment = webHostEnvironment;
         }
 
-        public string UploadImage(IFormFile profileImage)
+        public async Task<string> UploadImageAsync(IFormFile profileImage)
         {
             string uniqueFileName = null;
 
@@ -26,7 +27,7 @@ namespace Carpooling.Web.Helpers
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    profileImage.CopyTo(fileStream);
+                    await profileImage.CopyToAsync(fileStream);
                 }
             }
 

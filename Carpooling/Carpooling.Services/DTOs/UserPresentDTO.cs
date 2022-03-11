@@ -6,26 +6,6 @@ namespace Carpooling.Services.DTOs
 {
     public class UserPresentDTO
     {
-        public UserPresentDTO()
-        {
-
-        }
-
-        public UserPresentDTO(User user, IEnumerable<string> roles)
-        {
-            this.Id = user.Id;
-            this.Username = user.Username;
-            this.FirstName = user.FirstName;
-            this.LastName = user.LastName;
-            this.Email = user.Email;
-            this.PhoneNumber = user.PhoneNumber;
-            this.ProfilePic = user.ProfilePictureName;
-            this.Status = user.UserStatus;
-            this.Roles = roles;
-            this.RatingAsPassenger = user.RatingAsPassenger;
-            this.RatingAsDriver = user.RatingAsDriver;
-        }
-
         public int Id { get; set; }
 
         public string Username { get; set; }
@@ -38,14 +18,14 @@ namespace Carpooling.Services.DTOs
 
         public string PhoneNumber { get; set; }
 
-        public string ProfilePic { get; set; }
+        public string ProfilePictureName { get; set; }
 
         public double RatingAsDriver { get; set; }
 
         public double RatingAsPassenger { get; set; }
 
-        public UserStatus Status { get; set; }
+        public UserStatus UserStatus { get; set; }
 
-        public IEnumerable<string> Roles { get; set; }
+        public string Role { get; set; }
     }
 }

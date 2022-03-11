@@ -858,13 +858,13 @@ namespace Carpooling.Data.Migrations
 
             modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.Property<int>("RolesId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<int>("UsersId")
                         .HasColumnType("int");
 
-                    b.HasKey("RolesId", "UsersId");
+                    b.HasKey("RoleId", "UsersId");
 
                     b.HasIndex("UsersId");
 
@@ -873,82 +873,82 @@ namespace Carpooling.Data.Migrations
                     b.HasData(
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 1
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 2
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 3
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 4
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 5
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 6
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 7
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 8
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 9
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 10
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 11
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 12
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 13
                         },
                         new
                         {
-                            RolesId = 2,
+                            RoleId = 2,
                             UsersId = 12
                         },
                         new
                         {
-                            RolesId = 2,
+                            RoleId = 2,
                             UsersId = 13
                         },
                         new
                         {
-                            RolesId = 1,
+                            RoleId = 1,
                             UsersId = 14
                         });
                 });
@@ -1292,7 +1292,7 @@ namespace Carpooling.Data.Migrations
                 {
                     b.HasOne("Carpooling.Data.Models.Role", null)
                         .WithMany()
-                        .HasForeignKey("RolesId")
+                        .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

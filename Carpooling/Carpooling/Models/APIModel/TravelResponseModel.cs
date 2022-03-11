@@ -7,27 +7,13 @@ namespace Carpooling.Web.Models.APIModel
 {
     public class TravelResponseModel
     {
-        public TravelResponseModel(TravelPresentDTO travelPresentDTO, CityResponseModel startAddressResponseModel,
-                                  CityResponseModel endAddressResponseModel, IEnumerable<UserResponseModel> passengers)
-        {
-            this.TravelId = travelPresentDTO.Id;
-            this.StartPointAddress = startAddressResponseModel;
-            this.EndPointAddress = endAddressResponseModel;
-            this.DepartureTime = travelPresentDTO.DepartureTime;
-            this.FreeSpots = travelPresentDTO.FreeSpots;
-            this.IsCompleted = travelPresentDTO.IsCompleted;
-            this.DriverFirstName = travelPresentDTO.Driver.FirstName;
-            this.DriverLastName = travelPresentDTO.Driver.LastName;
-            this.Passengers = passengers;
-            this.TravelTags = travelPresentDTO.TravelTags;
-        }
         public int TravelId { get; }
 
         [Required(ErrorMessage = "Please enter a city from which you travel will start.")]
-        public CityResponseModel StartPointAddress { get; set; }
+        public string StartPointCityName { get; set; }
 
         [Required(ErrorMessage = "Please enter a city in which your travel will end.")]
-        public CityResponseModel EndPointAddress { get; set; }
+        public string EndPointCityName { get; set; }
 
         public string DriverFirstName { get; set; }
 

@@ -1,44 +1,27 @@
 ﻿using Carpooling.Data.Models;
 using System;
 using System.Collections.Generic;
-
+using System.ComponentModel.DataAnnotations;
 
 namespace Carpooling.Services.DTOs
 {
     public class TravelPresentDTO
     {
-        public TravelPresentDTO()
-        {
-
-        }
-
-        public TravelPresentDTO(Travel travel, CityPresentDTO startPoint, CityPresentDTO endPoint, UserPresentDTO driver, IEnumerable<UserPresentDTO> passengers,
-            IEnumerable<UserPresentDTO> applyingPassengers, IEnumerable<FeedbackPresentDTO> feedbacks, IEnumerable<string> travelTags)
-        {
-            this.Id = travel.Id;
-            this.StartPointAddress = startPoint;
-            this.EndPointAddress = endPoint;
-            this.Driver = driver;
-            this.DepartureTime = travel.DepartureTime;
-            this.FreeSpots = travel.FreeSpots;
-            this.IsCompleted = travel.IsCompleted;
-            this.Passengers = passengers;
-            this.ApplyingPassengers = applyingPassengers;
-            this.TravelTags = travelTags;
-            this.Feedbacks = feedbacks;
-        }
-
-
         public int Id { get; set; }
 
-        public CityPresentDTO StartPointAddress { get; set; }
+        [Required(ErrorMessage = "Please enter a city from which you travel will start.")]
+        public string StartPointCityName { get; set; }
 
-        public CityPresentDTO EndPointAddress { get; set; }
+        [Required(ErrorMessage = "Please enter a city in which your travel will end.")]
+        public string EndPointCityName { get; set; }
 
         public UserPresentDTO Driver { get; set; }
 
+        [Required]
         public DateTime DepartureTime { get; set; }
 
+        [Required]
+        [Range(1, 25, ErrorMessage = "The amount of passengers must be positive and at least 1.")]
         public int FreeSpots { get; set; }
 
         public bool IsCompleted { get; set; }

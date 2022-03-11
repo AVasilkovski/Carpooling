@@ -8,9 +8,9 @@ namespace Carpooling.Web.Models
 
         public string DriverUsername { get; set; }
 
-        public string StartCity { get; set; }
+        public string StartPointCityName { get; set; }
 
-        public string DestinationCity { get; set; }
+        public string EndPointCityName { get; set; }
 
         public int FreeSpots { get; set; }
 

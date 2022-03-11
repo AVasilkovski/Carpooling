@@ -1,8 +1,10 @@
+using AutoMapper;
 using Carpooling.Data;
 using Carpooling.Services.Services;
 using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers;
 using Carpooling.Web.Helpers.Contracts;
+using Carpooling.Web.Mappings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +42,12 @@ namespace Carpooling.Web
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Carpooling", Version = "v1" });
             });
+            var mapperConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new MappingProfile());
+            });
+            IMapper mapper = mapperConfig.CreateMapper();
+            services.AddSingleton(mapper);
             services.AddControllersWithViews();
 
             services.AddScoped<ITravelTagHelper, TravelTagHelper>();
@@ -50,6 +58,7 @@ namespace Carpooling.Web
             services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddScoped<ITravelTagService, TravelTagService>();
             services.AddScoped<ICityService, CityService>();
+            
 
         }
 

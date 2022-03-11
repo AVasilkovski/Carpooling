@@ -1,4 +1,6 @@
-﻿using Carpooling.Services.Services.Contracts;
+﻿using AutoMapper;
+using Carpooling.Services.DTOs;
+using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers;
 using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Http;
@@ -13,11 +15,13 @@ namespace Carpooling.Web.Controllers
     {
         private readonly IFeedbackService feedbackService;
         private readonly ITravelService travelService;
+        private readonly IMapper mapper;
 
-        public FeedbacksController(IFeedbackService feedbackService, ITravelService travelService)
+        public FeedbacksController(IFeedbackService feedbackService, ITravelService travelService, IMapper mapper)
         {
             this.feedbackService = feedbackService;
             this.travelService = travelService;
+            this.mapper = mapper;
         }
 
         public IActionResult Received(int id, string username, double? rating, bool ratingSort)
@@ -25,7 +29,7 @@ namespace Carpooling.Web.Controllers
             ViewData["VisitedFeedbacksUserId"] = id;
 
             var feedbacks = this.feedbackService.SearchUserRecievedFeedbacks(id, username, rating, ratingSort);
-            var searchResult = feedbacks.Select(feedback => feedback.ToFeedbackReceivedViewModel());
+            var searchResult = feedbacks.Select(feedback => this.mapper.Map<FeedbackSearchViewModel>(feedback));
             return View(searchResult);
         }
 
@@ -34,7 +38,7 @@ namespace Carpooling.Web.Controllers
             ViewData["VisitedFeedbacksUserId"] = id;
 
             var feedbacks = this.feedbackService.SearchUserGivenFeedbacks(id, username, rating, ratingSort);
-            var searchResult = feedbacks.Select(feedback => feedback.ToFeedbackGivenViewModel());
+            var searchResult = feedbacks.Select(feedback => this.mapper.Map<FeedbackSearchViewModel>(feedback));
             return View(searchResult);
         }
 
@@ -55,8 +59,8 @@ namespace Carpooling.Web.Controllers
             }
 
             var userFromId = int.Parse(this.HttpContext.Session.GetString("UserId"));
-            var travel = this.travelService.Get(travelId);
-            var feedback = feedbackCreateViewModel.ToFeedbackCreateDTO();
+            var travel = await this.travelService.GetAsync(travelId);
+            var feedback = this.mapper.Map<FeedbackCreateDTO>(feedbackCreateViewModel);
             feedback.UserFromId = userFromId;
             feedback.TravelId = travelId;
             feedback.UserToId = userToId;

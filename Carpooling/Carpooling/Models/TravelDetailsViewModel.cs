@@ -7,24 +7,24 @@ namespace Carpooling.Web.Models
     {
         public int Id { get; set; }
 
-        public string StartCity { get; set; }
+        public string StartPointCityName { get; set; }
 
-        public string DestinationCity { get; set; }
+        public string EndPointCityName { get; set; }
 
         public DateTime DepartureTime { get; set; }
 
         public bool Completed { get; set; }
 
-        public int Spots { get; set; }
+        public int FreeSpots { get; set; }
 
         public int AvailableSpots { get; set; }
 
         public UserProfileViewModel Driver { get; set; }
 
-        public IEnumerable<UserProfileViewModel> Participants { get; set; }
+        public IEnumerable<UserProfileViewModel> Passengers { get; set; }
 
-        public IEnumerable<UserProfileViewModel> Applicants { get; set; }
+        public IEnumerable<UserProfileViewModel> ApplyingPassengers { get; set; }
 
-        public IEnumerable<string> Tags { get; set; }
+        public IEnumerable<string> TravelTags { get; set; }
     }
 }

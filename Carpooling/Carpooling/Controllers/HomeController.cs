@@ -1,4 +1,5 @@
-﻿using Carpooling.Services.Services.Contracts;
+﻿using AutoMapper;
+using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -10,17 +11,19 @@ namespace Carpooling.Web.Controllers
     {
         private readonly IUserService userService;
         private readonly ITravelService travelService;
+        private readonly IMapper mapper;
 
-        public HomeController(IUserService userService, ITravelService travelService)
+        public HomeController(IUserService userService, ITravelService travelService, IMapper mapper)
         {
             this.userService = userService;
             this.travelService = travelService;
+            this.mapper = mapper;
         }
 
         public IActionResult Index()
         {
-            var top10Drivers = this.userService.GetTop10Drivers().Select(driver => driver.ToUserHomeViewModel());
-            var top10Passengers = this.userService.GetTop10Passengers().Select(passenger => passenger.ToUserHomeViewModel());
+            var top10Drivers = this.userService.GetTop10Drivers().Select(driver => this.mapper.Map<UserHomeViewModel>(driver)); ;
+            var top10Passengers = this.userService.GetTop10Passengers().Select(passenger => this.mapper.Map<UserHomeViewModel>(passenger));
             var homeModel = new HomeViewModel()
             {
                 UsersCount = this.userService.GetAll().Count(),

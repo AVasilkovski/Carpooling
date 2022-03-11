@@ -4,11 +4,6 @@ namespace Carpooling.Services.DTOs
 {
     public class CityPresentDTO
     {
-        public CityPresentDTO(City city)
-        {
-            City = city.Name;
-        }
-
-        public string City { get; set; }
+        public string Name { get; set; }
     }
 }

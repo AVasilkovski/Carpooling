@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Carpooling.Data.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Carpooling.Web.Models.APIModel
 {
@@ -9,7 +10,7 @@ namespace Carpooling.Web.Models.APIModel
 
         public string Comment { get; set; }
 
-        public string Type { get; set; }
+        public FeedbackType Type { get; set; }
 
         [Required]
         public int TravelId { get; set; }

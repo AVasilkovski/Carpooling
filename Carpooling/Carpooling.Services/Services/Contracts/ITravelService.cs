@@ -10,7 +10,7 @@ namespace Carpooling.Services.Services.Contracts
 
         Task<TravelPresentDTO> CreateAsync(TravelCreateDTO newTravel);
 
-        TravelPresentDTO Get(int id);
+        Task<TravelPresentDTO> GetAsync(int id);
 
         Task<TravelPresentDTO> UpdateAsync(int id, TravelCreateDTO travel);
 

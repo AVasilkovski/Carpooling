@@ -2,6 +2,7 @@
 using Carpooling.Services.Exceptions;
 using Carpooling.Services.Services.Contracts;
 using Carpooling.Web.Helpers.Contracts;
+using System.Threading.Tasks;
 
 namespace Carpooling.Web.Helpers
 {
@@ -16,11 +17,11 @@ namespace Carpooling.Web.Helpers
             this.userService = userService;
         }
 
-        public UserPresentDTO TryGetUser(string credentialsHeader, string passwordHeader)
+        public async Task<UserPresentDTO> TryGetUserAsync(string credentialsHeader, string passwordHeader)
         {
             try
             {
-                var user = this.userService.GetUserByCredentials(credentialsHeader, passwordHeader);
+                var user = await this.userService.GetUserByCredentialsAsync(credentialsHeader, passwordHeader);
                 return user;
             }
             catch (EntityNotFoundException)
