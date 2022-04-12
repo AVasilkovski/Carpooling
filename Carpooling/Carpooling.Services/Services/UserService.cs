@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Carpooling.Data;
 using Carpooling.Data.Models;
 using Carpooling.Data.Models.Enums;
@@ -57,22 +58,26 @@ namespace Carpooling.Services.Services
 
         public async Task<UserPresentDTO> GetAsync(int id)
         {
-            var user = await this.GetUserAsync(id);
+            var user =  await this.dbContext.Users.Where(user => user.Id == id)
+                                                  .ProjectTo<UserPresentDTO>(mapper.ConfigurationProvider)
+                                                  .FirstOrDefaultAsync(user => user.Id == id);
 
-            return this.mapper.Map<UserPresentDTO>(user);
+            return user;
         }
-        public UserPresentDTO Get(int id)
+        public UserPresentDTO Get(int id)  
         {
-            var user =  this.GetUserAsync(id);
+            var user = this.dbContext.Users.Where(user => user.Id == id)
+                                           .ProjectTo<UserPresentDTO>(mapper.ConfigurationProvider)
+                                           .FirstOrDefault(user => user.Id == id);
 
-            return this.mapper.Map<UserPresentDTO>(user);
+            return user;
         }
 
         public IEnumerable<UserPresentDTO> GetAll()
         {
             var result = this.GetAllUsers();
 
-            return result.Select(user => mapper.Map<UserPresentDTO>(user));
+            return result;
         }
 
         public async Task<UserPresentDTO> UpdateAsync(int id, UserCreateDTO updateUser)
@@ -117,7 +122,7 @@ namespace Carpooling.Services.Services
 
         public async Task<UserPresentDTO> GetUserByCredentialsAsync(string username, string password)
         {
-            var user = await this.UsersQuerry.FirstOrDefaultAsync(user => user.Username == username && user.Password == password);
+            var user = await this.dbContext.Users.FirstOrDefaultAsync(user => user.Username == username && user.Password == password);
 
             if (user == null)
             {
@@ -129,23 +134,25 @@ namespace Carpooling.Services.Services
 
         public IEnumerable<UserPresentDTO> GetTop10Drivers()
         {
-            return this.UsersQuerry.Where(user => user.RatingAsDriver > 0)
+            return this.dbContext.Users.Where(user => user.RatingAsDriver > 0)
                                    .OrderByDescending(user => user.RatingAsDriver)
                                    .Take(10)
-                                   .Select(user => mapper.Map<UserPresentDTO>(user));
+                                   .ProjectTo<UserPresentDTO>(mapper.ConfigurationProvider)
+                                   .ToList();
         }
 
         public IEnumerable<UserPresentDTO> GetTop10Passengers()
         {
-            return this.UsersQuerry.Where(user => user.RatingAsPassenger > 0)
+            return this.dbContext.Users.Where(user => user.RatingAsPassenger > 0)
                                    .OrderByDescending(user => user.RatingAsPassenger)
                                    .Take(10)
-                                   .Select(user => mapper.Map<UserPresentDTO>(user));
+                                   .ProjectTo<UserPresentDTO>(mapper.ConfigurationProvider)
+                                   .ToList();
         }
 
         public IEnumerable<UserPresentDTO> GetFilteredUsers(string phoneNumber, string username, string email)
         {
-            return this.FilterUsers(phoneNumber, username, email).Select(user => mapper.Map<UserPresentDTO>(user));
+            return this.FilterUsers(phoneNumber, username, email);
         }
 
         public async Task BlockUserAsync(int id)
@@ -188,7 +195,9 @@ namespace Carpooling.Services.Services
 
             if (feedbackType == FeedbackType.Driver)
             {
-                var ratings = user.RecievedFeedbacks.Where(feedbacks => feedbacks.Type == FeedbackType.Driver).Select(feedback => feedback.Rating);
+                var ratings = user.RecievedFeedbacks.
+                    Where(feedbacks => feedbacks.Type == FeedbackType.Driver).
+                    Select(feedback => feedback.Rating);
                 var average = ratings.Average();
                 user.RatingAsPassenger = average;
             }
@@ -203,7 +212,7 @@ namespace Carpooling.Services.Services
             await this.dbContext.SaveChangesAsync();
         }
 
-        private IEnumerable<User> FilterUsers(string phoneNumber, string username, string email)
+        private IEnumerable<UserPresentDTO> FilterUsers(string phoneNumber, string username, string email)
         {
             var users = this.GetAllUsers();
 
@@ -225,9 +234,11 @@ namespace Carpooling.Services.Services
             return users;
         }
 
-        private IEnumerable<User> GetAllUsers()
+        private IEnumerable<UserPresentDTO> GetAllUsers()
         {
-            return this.UsersQuerry.Where(user => user.Role.Any(role => role.Name != "Admin"));
+            return this.dbContext.Users.Where(user => user.Role.Any(role => role.Name != "Admin"))
+                                       .ProjectTo<UserPresentDTO>(mapper.ConfigurationProvider)
+                                       .ToList();
         }
 
         private async Task<User> GetUserAsync(int id)

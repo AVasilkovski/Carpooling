@@ -6,6 +6,7 @@ using Carpooling.Web.Models.APIModel;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Carpooling.Web.Mappings
 {
@@ -13,12 +14,16 @@ namespace Carpooling.Web.Mappings
     {
         public MappingProfile()
         {
-            this.CreateMap<User, UserPresentDTO>().ReverseMap();
+              this.CreateMap<User, UserPresentDTO>().ReverseMap();
             this.CreateMap<User, Role>();
             this.CreateMap<Feedback, User>();
             this.CreateMap<User, UserCreateDTO>().ReverseMap();
-            this.CreateMap<Travel, TravelPresentDTO>();
-            this.CreateMap<Travel, TravelCreateDTO>().ReverseMap();
+            this.CreateMap<Travel, TravelPresentDTO>()
+                .ForMember(dto => dto.TravelTags, conf => conf.MapFrom(ol => ol.TravelTags.Select(y => y.Tag).ToList()))
+                .ReverseMap();
+            this.CreateMap<Travel, TravelCreateDTO>()
+                .ForMember(dto => dto.TravelTags, conf => conf.MapFrom(ol => ol.TravelTags.Select(y => y.Tag).ToList()))
+                .ReverseMap();
             this.CreateMap<Feedback, FeedbackPresentDTO>();
             this.CreateMap<Feedback, FeedbackCreateDTO>().ReverseMap();
             this.CreateMap<City, CityCreateDTO>();
@@ -36,9 +41,7 @@ namespace Carpooling.Web.Mappings
             this.CreateMap<TravelCreateViewModel, TravelTag>().ReverseMap();
             this.CreateMap<FeedbackResponseModel, FeedbackPresentDTO>();
             this.CreateMap<FeedbackCreateDTO, FeedbackRequestModel>().ReverseMap();
-            this.CreateMap<TravelPresentDTO, TravelDetailsViewModel>()
-                .ForMember(dto => dto.Driver, conf => conf.MapFrom(ol => ol.Driver))
-                .ForMember(dto => dto.TravelTags, conf => conf.MapFrom(ol => ol.TravelTags));
+            this.CreateMap<TravelPresentDTO, TravelDetailsViewModel>();
             this.CreateMap<TravelCreateDTO, TravelUpdateViewModel>();
             this.CreateMap<TravelCreateDTO, TravelCreateViewModel>().ReverseMap();
             this.CreateMap<TravelViewModel, TravelPresentDTO>().ReverseMap();
@@ -49,10 +52,13 @@ namespace Carpooling.Web.Mappings
             this.CreateMap<UserCreateDTO, UserUpdateViewModel>().ReverseMap();
             this.CreateMap<UserHomeViewModel, UserPresentDTO>().ReverseMap();
             this.CreateMap<UserCreateDTO, RegisterViewModel>();
-            this.CreateMap<UserPresentDTO, FeedbackSearchViewModel>().ReverseMap();
-            this.CreateMap<FeedbackSearchViewModel, FeedbackPresentDTO>().ReverseMap();
-            this.CreateMap<FeedbackSearchViewModel, FeedbackPresentDTO>();
-            this.CreateMap<FeedbackViewModel, FeedbackPresentDTO>().ReverseMap();
+            this.CreateMap<UserPresentDTO, FeedbackSearchViewModel>()
+                .ForMember(x => x.UserId, y => y.MapFrom(src => src.Id))
+                .ReverseMap();
+            this.CreateMap<FeedbackViewModel, FeedbackPresentDTO>() .ReverseMap();
+            this.CreateMap<FeedbackViewModel, FeedbackSearchViewModel>() .ReverseMap();
+            this.CreateMap<FeedbackPresentDTO, FeedbackSearchViewModel>() .ReverseMap();
+            this.CreateMap<FeedbackGivenViewModel, FeedbackPresentDTO>().ReverseMap();
             this.CreateMap<FeedbackCreateDTO, FeedbackCreateViewModel>().ReverseMap();
             this.CreateMap<IEnumerable<UserProfileViewModel>, ParticipantsViewModel>()
                 .ForMember(x => x.Passengers, y => y.MapFrom(src => src));

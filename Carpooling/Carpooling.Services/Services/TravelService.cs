@@ -9,6 +9,7 @@ using Carpooling.Services.Services.Contracts;
 using Carpooling.Services.Exceptions;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace Carpooling.Services.Services
 {
@@ -46,7 +47,7 @@ namespace Carpooling.Services.Services
 
         public IEnumerable<TravelPresentDTO> GetAll()
         {
-            return this.TravelsQuery.Select(travel => mapper.Map<TravelPresentDTO>(travel));
+            return this.dbContext.Travels.ProjectTo<TravelPresentDTO>(mapper.ConfigurationProvider).ToList(); //.Select(travel => mapper.Map<TravelPresentDTO>(travel))
         }
 
         public async Task<TravelPresentDTO> GetAsync(int id)
@@ -63,7 +64,7 @@ namespace Carpooling.Services.Services
             var travel = this.mapper.Map<TravelPresentDTO>(newTravel);
             travel.StartPointCityName = startCity;
             travel.EndPointCityName = destinationCity;
-            travel.TravelTags = (IEnumerable<string>)this.travelTagService.FindTags(newTravel.TravelTags);
+            travel.TravelTags = this.travelTagService.FindTags(newTravel.TravelTags).Select(x => x.Tag.ToString());
             await this.dbContext.Travels.AddAsync(this.mapper.Map<Travel>(travel));
             await this.dbContext.SaveChangesAsync();
             var createdTravel = await this.GetTravelAsync(travel.Id);
@@ -100,56 +101,62 @@ namespace Carpooling.Services.Services
 
         public IEnumerable<TravelPresentDTO> SearchAllTravels(string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
-            var travels = this.TravelsQuery;
+            var travels = this.dbContext.Travels.ProjectTo<TravelPresentDTO>(mapper.ConfigurationProvider).ToList();
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
+            return searchResult;
         }
 
         public IEnumerable<TravelPresentDTO> SearchAvailableTravels(string user, string destinationCity, string startCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
-            var travels = this.TravelsQuery.Where(travel => travel.Driver.Username != user && travel.IsCompleted == false);
+            var travels = this.dbContext.Travels.Where(travel => travel.Driver.Username != user && travel.IsCompleted == false)
+                .ProjectTo<TravelPresentDTO>(mapper.ConfigurationProvider).ToList();
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
+            return searchResult;
         }
 
         public IEnumerable<TravelPresentDTO> SearchFinishedUserTravels(string user, string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
-            var travelsAsPassenger = this.TravelsQuery.Where(travel => travel.Driver.Username == user && travel.IsCompleted == true);
-            var travelsAsDriver = this.TravelsQuery.Where(travel => travel.Passengers.Any(passenger => passenger.Username == user));
+            var travelsAsPassenger = this.dbContext.Travels.Where(travel => travel.Driver.Username == user && travel.IsCompleted == true);
+            var travelsAsDriver = this.dbContext.Travels.Where(travel => travel.Passengers.Any(passenger => passenger.Username == user));
             travelsAsDriver.Where(travel => travel.IsCompleted == true);
-            var travels = travelsAsPassenger.Union(travelsAsDriver);
+            var travels = travelsAsPassenger.Union(travelsAsDriver).ProjectTo<TravelPresentDTO>(mapper.ConfigurationProvider).ToList(); ;
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
+            return searchResult;
         }
 
         public IEnumerable<TravelPresentDTO> SearchUserAsDriverTravels(string user, string startCity, string destinationCity, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
-            var travels = this.TravelsQuery.Where(travel => travel.Driver.Username == user && travel.IsCompleted == false);
+            var travels = this.dbContext.Travels.Where(travel => travel.Driver.Username == user && travel.IsCompleted == false)
+                                                .ProjectTo<TravelPresentDTO>(mapper.ConfigurationProvider).ToList();
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
+            return searchResult;
         }
 
         public IEnumerable<TravelPresentDTO> SearchAppliedUserTravels(string user, string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
-            var travels = this.TravelsQuery.Where(travel => travel.ApplyingPassengers.Any(passenger => passenger.Username == user));
+            var travels = this.dbContext.Travels.Where(travel => travel.ApplyingPassengers
+                                                .Any(passenger => passenger.Username == user))
+                                                .ProjectTo<TravelPresentDTO>(mapper.ConfigurationProvider).ToList();
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
+            return searchResult;
         }
 
         public IEnumerable<TravelPresentDTO> SearchApprovedUserTravels(string user, string startCity, string destinationCity, string driverName, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
-            var travels = this.TravelsQuery.Where(travel => travel.Passengers.Any(passenger => passenger.Username == user));
+            var travels = this.dbContext.Travels.Where(travel => travel.Passengers
+                                                .Any(passenger => passenger.Username == user))
+                                                .ProjectTo<TravelPresentDTO>(mapper.ConfigurationProvider).ToList();
             var searchResult = this.SearchTravels(travels, startCity, destinationCity, driverName, freeSpots, sortByDate, sortByFreeSpots);
 
-            return searchResult.Select(travel => this.mapper.Map<TravelPresentDTO>(travel));
+            return searchResult;
         }
 
-        private IQueryable<Travel> SearchTravels(IQueryable<Travel> travels, string startCity, string destinationCity, string driver, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
+        private IEnumerable<TravelPresentDTO> SearchTravels(IEnumerable<TravelPresentDTO> travels, string startCity, string destinationCity, string driver, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
             if (!string.IsNullOrEmpty(driver))
             {
@@ -161,16 +168,16 @@ namespace Carpooling.Services.Services
             return travels;
         }
 
-        private IQueryable<Travel> SearchTravels(IQueryable<Travel> travels, string startCity, string destinationCity, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
+        private IEnumerable<TravelPresentDTO> SearchTravels(IEnumerable<TravelPresentDTO> travels, string startCity, string destinationCity, int? freeSpots, bool sortByDate, bool sortByFreeSpots)
         {
             if (!string.IsNullOrEmpty(startCity))
             {
-                travels = travels.Where(travel => travel.StartPointCity.Name.Contains(startCity));
+                travels = travels.Where(travel => travel.StartPointCityName.Contains(startCity));
             }
 
             if (!string.IsNullOrEmpty(destinationCity))
             {
-                travels = travels.Where(travel => travel.EndPointCity.Name.Contains(destinationCity));
+                travels = travels.Where(travel => travel.EndPointCityName.Contains(destinationCity));
             }
 
             if (freeSpots != null)
@@ -344,5 +351,7 @@ namespace Carpooling.Services.Services
                 throw new EntityNotFoundException($"Travel with ID {id} not found.");
             }
         }
+
+      
     }
 }
