@@ -38,7 +38,7 @@ namespace Carpooling.Services.Services
 
         public IQueryable<FeedbackPresentDTO> GetAll()
         {
-            return this.FeedbacksQuery.ProjectTo<FeedbackPresentDTO>(mapper.ConfigurationProvider); //Select(feedback => mapper.Map<FeedbackPresentDTO>(feedback));
+            return this.dbContext.Feedbacks.ProjectTo<FeedbackPresentDTO>(mapper.ConfigurationProvider);
         }
 
         public async Task<FeedbackPresentDTO> GetAsync(int id)
@@ -70,7 +70,8 @@ namespace Carpooling.Services.Services
 
         public IEnumerable<FeedbackPresentDTO> SearchUserGivenFeedbacks(int userId, string username, double? rating, bool ratingSort)
         {
-            var userGivenFeedbacks = this.FeedbacksQuery.Where(feedback => feedback.UserFromId == userId);
+            var userGivenFeedbacks = this.dbContext.Feedbacks.Where(feedback => feedback.UserFromId == userId)
+                .ProjectTo<FeedbackPresentDTO>(mapper.ConfigurationProvider).ToList();
             var serachResult = this.SearchFeedbacks(userGivenFeedbacks, username, rating, ratingSort);
 
             return serachResult;
@@ -78,17 +79,18 @@ namespace Carpooling.Services.Services
 
         public IEnumerable<FeedbackPresentDTO> SearchUserRecievedFeedbacks(int userId, string username, double? rating, bool ratingSort)
         {
-            var userRecievedFeedbacks = this.FeedbacksQuery.Where(feedback => feedback.UserToId == userId);
+            var userRecievedFeedbacks = this.dbContext.Feedbacks.Where(feedback => feedback.UserToId == userId)
+                .ProjectTo<FeedbackPresentDTO>(mapper.ConfigurationProvider).ToList();
             var searchResult = this.SearchFeedbacks(userRecievedFeedbacks, username, rating, ratingSort);
 
             return searchResult;
         }
 
-        private IEnumerable<FeedbackPresentDTO> SearchFeedbacks(IQueryable<Feedback> feedbacks, string username, double? rating, bool ratingSort)
+        private IEnumerable<FeedbackPresentDTO> SearchFeedbacks(IEnumerable<FeedbackPresentDTO> feedbacks, string username, double? rating, bool ratingSort)
         {
             if (username != null)
             {
-                feedbacks = feedbacks.Where(feedback => feedback.UserFrom.Username.Contains(username));
+                feedbacks = feedbacks.Where(feedback => feedback.UserFromUsername.Contains(username));
             }
 
             if (rating != null)
@@ -101,9 +103,7 @@ namespace Carpooling.Services.Services
                 feedbacks = feedbacks.OrderByDescending(feedback => feedback.Rating);
             }
 
-            var result = feedbacks.Select(feedback => mapper.Map<FeedbackPresentDTO>(feedback));
-
-            return result;
+            return feedbacks;
         }
 
         private async Task<Feedback> GetFeedbackAsync(int id)
